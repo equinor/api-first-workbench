@@ -328,6 +328,62 @@ components:
             $ref: '#/components/schemas/ProblemDetails'            
       
   schemas:
+    ProblemDetails:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Reference to HTTP status definition
+              example: 'https://tools.ietf.org/html/rfc7231#section-6.5.1'
+              nullable: true
+            title:
+              type: string
+              description: Description of error
+              example: 'One or more validation errors occurred.'
+              nullable: true
+            status:
+              type: integer
+              description: HTTP status code
+              example: 400
+              format: int32
+              nullable: true
+            traceId:
+              type: string
+              description: Request id to be used for support
+              example: '00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00'
+            errors:
+              type: object
+              description: Detailed information about error
+              additionalProperties:
+                type: object
+                additionalProperties: false
+              nullable: true
+              readOnly: true
+          additionalProperties: false
+    NotFoundDetails:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Reference to HTTP status definition
+              example: 'https://tools.ietf.org/html/rfc7231#section-6.5.4'
+              nullable: true
+            title:
+              type: string
+              description: Description of error
+              example: 'Not Found'
+              nullable: true
+            status:
+              type: integer
+              description: HTTP status code
+              example: 404
+              format: int32
+              nullable: true
+            traceId:
+              type: string
+              description: Request id to be used for support
+              example: '00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00'
+          additionalProperties: false  
     Location:
       type: object
       properties:
