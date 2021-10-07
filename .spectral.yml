@@ -1,0 +1,5 @@
+extends: spectral:oas
+rules:
+  oas3-valid-oas-content-example: warn
+  no-$ref-siblings: warn
+  operation-tag-defined: error
