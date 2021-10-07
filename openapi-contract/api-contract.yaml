@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: {{API_NAME}} API
+  title: '{{API_NAME}} API'
   description: |
     The {{API_NAME}} API is an open API covering the {{BUSINESS_AREA}} area in Equinor.
 
