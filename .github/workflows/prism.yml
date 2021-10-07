@@ -39,12 +39,12 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Generate full paths in OAS
         run: |
-          python openapi-contract/generated/generate_paths.py OpenAPI/maintenance-api.yaml
+          python openapi-contract/generated/generate_paths.py openapi-contract/api-contract.yaml
 
       - name: Install openapi-flattener
         run:  sudo npm install openapi-flattener -g
       - name: Flatten OpenApi Document
-        run:  openapi-flattener -s  OpenAPI/generated/api-contract-with-full-path.yaml -o  OpenAPI/generated/api-contract-flattened.yaml
+        run:  openapi-flattener -s  openapi-contract/generated/api-contract-with-full-path.yaml -o  openapi-contract/generated/api-contract-flattened.yaml
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
