@@ -1,0 +1,53 @@
+name: Prepare OpenAPI for Prism Validation
+# Prism: https://github.com/stoplightio/prism
+# Prism, used as a validating proxy, doesn't like advanced nested structures with all-of and $ref.
+#
+# We therefore do some transformations whenever the OpenAPI contract is updated
+# - generate_paths.py: Creates file openapi-contract/generated/api-contract-with-full-path.yaml where endpoint paths include the /{{API_NAME}} used by API Management
+# - openapi-flattener: https://github.com/equinor/openapi-flattener This package takes an OpenApi (yaml | json) file and flattens all references in the file. 
+
+on:
+  # Triggered on commits and pullrequest or manually
+  workflow_dispatch:
+  push:
+    paths:
+      - 'openapi-contract/*.yaml'
+  pull_request:
+    paths:
+       - 'openapi-contract/*.yaml'
+jobs:
+  generate-prism-oas:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pyyaml
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Generate full paths in OAS
+        run: |
+          python openapi-contract/generated/generate_paths.py OpenAPI/maintenance-api.yaml
+
+      - name: Install openapi-flattener
+        run:  sudo npm install openapi-flattener -g
+      - name: Flatten OpenApi Document
+        run:  openapi-flattener -s  OpenAPI/generated/api-contract-with-full-path.yaml -o  OpenAPI/generated/api-contract-flattened.yaml
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'auto: committed OAS-file for Prism validation'
+          commit_user_name: Github actions bot
+          commit_user_email: dapa@equinor.com

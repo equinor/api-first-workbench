@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf8" />
+  <title>{{title}}</title>
+  <!--Maintenance API custom template-->
+  <!-- needed for adaptive design -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+    .lgiBxe {
+      color: #007079 !important;
+      font-weight: bold !important;
+    }
+    label[role=menuitem][type=group] {
+      color: #007079 !important;
+      font-weight: bold !important;
+    }    
+    h1 {
+      font-size: 3em !important;
+      margin-bottom: 0px !important;
+      margin-top: 0px !important;
+    }
+    h2 {
+      margin-bottom: 0px !important;
+      margin-top: 0px !important;
+    }
+  </style>
+  {{{redocHead}}}
+  {{#unless disableGoogleFont}}<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">{{/unless}}
+  <link
+    rel="stylesheet"
+    href="https://eds-static.equinor.com/font/equinor-font.css"
+  />
+  <!-- Script for postman sharing https://learning.postman.com/docs/collaborating-in-postman/sharing/#sharing-by-link -->
+  <script type="text/javascript">
+  (function (p,o,s,t,m,a,n) {
+    !p[s] && (p[s] = function () { (p[t] || (p[t] = [])).push(arguments); });
+    !o.getElementById(s+t) && o.getElementsByTagName("head")[0].appendChild((
+      (n = o.createElement("script")),
+      (n.id = s+t), (n.async = 1), (n.src = m), n
+    ));
+  }(window, document, "_pm", "PostmanRunObject", "https://run.pstmn.io/button.js"));
+  </script>     
+</head>
+
+<body>
+  {{{redocHTML}}}
+</body>
+
+</html>

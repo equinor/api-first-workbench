@@ -1,0 +1,69 @@
+name: Redoc generator
+# Redoc: https://github.com/Redocly/redoc
+# Creates OpenAPI documentation based on the OpenAPI contract.
+# Uses snippet-encricher-cli https://github.com/cdwv/oas3-api-snippet-enricher to add code examples to the developer documentation.
+# The OpenAPI documentation is configured to be published to Github pages (uses branch gh-pages-source as a base).
+# Updated for every commit of the openapi-contract/*.yaml
+# If commit is done in a branch, this will be represented in the url path.
+
+on: 
+  #Triggered on push for all branches or manually
+  workflow_dispatch:
+  push:
+    paths:
+    - - 'openapi-contract/*.yaml'
+    
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+    name: Generate docs
+    steps:
+
+      # first checkout your code
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      # Install tool to add code snippets
+      - name: Install snippet-enricher-cli
+        run: npm install snippet-enricher-cli
+      # Run tool to add code snippets
+      - name: Run snippet-enricher-cli
+        run: npx snippet-enricher-cli --input=openapi-contract/api-contract.yaml --targets="shell_curl,node_native,python_python3" > openapi-with-code-examples.json
+      # use redoc-cli-github-action to generate your HTML bundle
+      # Note: This redoc version is slightly outdated and alternatives should be investigated
+      - name: redoc-cli
+        uses: seeebiii/redoc-cli-github-action@v10
+        with:
+          args: 'bundle openapi-with-code-examples.json -o index.html -t openapi-contract/redoc-template/redoc-template.hbs --options.requiredPropsFirst=true --options.jsonSampleExpandLevel=3 --options.theme.spacing.sectionVertical=10 --options.theme.typography.fontFamily=Equinor,Roboto,sans-serif --options.theme.colors.primary.main=#007079'
+      - name: Upload redoc index.html file
+        uses: actions/upload-artifact@v2
+        with:
+          name: redoc-index
+          path: index.html
+        #Checkout gh-pages-source branch in order to update github pages
+      - uses: actions/checkout@v2
+        with:
+          ref: gh-pages-source 
+      - name: Download redoc index.html file
+        uses: actions/download-artifact@v2
+        with:
+          name: redoc-index
+      - name: Get branch environment variable
+        shell: bash
+        run: echo "GITHUB_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+      - name: Master branch copy
+        if: env.GITHUB_BRANCH == 'master'
+        run: mv index.html docs/
+      - name: Copy to latest if not master
+        if: env.GITHUB_BRANCH != 'master' 
+        run: mkdir -p docs/latest  && cp index.html docs/latest
+      - name: Move to normal release branch
+        if: env.GITHUB_BRANCH != 'master' 
+        run: mkdir -p docs/$GITHUB_BRANCH  && mv index.html docs/$GITHUB_BRANCH
+      # commit generated redoc to gh-pages-source  branch
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: gh-pages-source
+          commit_message: auto: Generated updated redoc developer documentation
+          commit_user_name: Github actions bot
+          commit_user_email: dapa@equinor.com
