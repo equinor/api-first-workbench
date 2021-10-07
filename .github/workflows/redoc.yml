@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-    - - 'openapi-contract/*.yaml'
+      - 'openapi-contract/*.yaml'
     
 jobs:
   generate-docs:
