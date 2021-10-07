@@ -38,6 +38,62 @@ components:
       - locationId
       - location
       type: object
+    NotFoundDetails:
+      additionalProperties: false
+      properties:
+        status:
+          description: HTTP status code
+          example: 404
+          format: int32
+          nullable: true
+          type: integer
+        title:
+          description: Description of error
+          example: Not Found
+          nullable: true
+          type: string
+        traceId:
+          description: Request id to be used for support
+          example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+          type: string
+        type:
+          description: Reference to HTTP status definition
+          example: https://tools.ietf.org/html/rfc7231#section-6.5.4
+          nullable: true
+          type: string
+      type: object
+    ProblemDetails:
+      additionalProperties: false
+      properties:
+        errors:
+          additionalProperties:
+            additionalProperties: false
+            type: object
+          description: Detailed information about error
+          nullable: true
+          readOnly: true
+          type: object
+        status:
+          description: HTTP status code
+          example: 400
+          format: int32
+          nullable: true
+          type: integer
+        title:
+          description: Description of error
+          example: One or more validation errors occurred.
+          nullable: true
+          type: string
+        traceId:
+          description: Request id to be used for support
+          example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+          type: string
+        type:
+          description: Reference to HTTP status definition
+          example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+          nullable: true
+          type: string
+      type: object
   securitySchemes:
     apiKey:
       description: Subscription key created from https://api.equinor.com
