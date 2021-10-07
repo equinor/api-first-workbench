@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-    - - 'openapi-contract/*.yaml'
+      - 'openapi-contract/*.yaml'
     
 jobs:
   generate-docs:
@@ -64,6 +64,6 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: gh-pages-source
-          commit_message: auto: Generated updated redoc developer documentation
+          commit_message: 'auto: Generated updated redoc developer documentation'
           commit_user_name: Github actions bot
           commit_user_email: dapa@equinor.com
