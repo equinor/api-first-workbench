@@ -1,0 +1,21 @@
+apiVersion: radix.equinor.com/v1
+kind: RadixApplication
+metadata:
+  name: maintenance-api-prism
+spec:
+  build:
+    #secrets:
+    #  - NUGET_PAT
+  environments:
+    - name: test
+      build:
+        from: prism-test
+  components:
+    - name: proxy
+      dockerfileName: radix.Dockerfile
+      publicPort: http
+      ports:
+        - name: http
+          port: 4010
+     # secrets:
+     #   - ClientSecret
