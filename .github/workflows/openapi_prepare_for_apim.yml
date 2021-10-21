@@ -1,4 +1,4 @@
-name: Scrub 'examples' from openapi-contract
+name: OpenAPI prepare for APIM
 # API Management does not support examples in the OpenAPI contract (ref https://docs.microsoft.com/en-us/azure/api-management/api-management-api-import-restrictions)
 # Therefore, we use a python script to remove the examples and save the new file as openapi-contract/api-contract-scrubbed-example.yaml
 
