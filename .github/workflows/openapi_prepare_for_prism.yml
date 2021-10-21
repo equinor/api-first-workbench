@@ -1,4 +1,4 @@
-name: OpenAPI prepare for Prism proxy validatoin
+name: OpenAPI prepare for Prism proxy validation
 # Prism: https://github.com/stoplightio/prism
 # Prism, used as a validating proxy, doesn't like advanced nested structures with all-of and $ref.
 #
