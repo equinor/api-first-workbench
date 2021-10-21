@@ -219,10 +219,8 @@ externalDocs:
   url: 'https://equinor.github.io/api-first-workbench'
   
 servers:
-  - url: https://api-test.gateway.equinor.com/api-first-workbench
-    description: Test/QA environment
-  - url: https://api.gateway.equinor.com/api-first-workbench
-    description: Production environment
+  - url: https://api-dev.gateway.equinor.com/api-first-workbench
+    description: Development environment
 
 security:
   - bearerAuth: [ ]
