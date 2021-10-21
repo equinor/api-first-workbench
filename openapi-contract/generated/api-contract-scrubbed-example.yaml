@@ -300,10 +300,8 @@ security:
 - bearerAuth: []
 - apiKey: []
 servers:
-- description: Test/QA environment
-  url: https://api-test.gateway.equinor.com/api-first-workbench
-- description: Production environment
-  url: https://api.gateway.equinor.com/api-first-workbench
+- description: Development environment
+  url: https://api-dev.gateway.equinor.com/api-first-workbench
 tags:
 - description: 'Endpoints which are introduces in the current version
 
