@@ -51,14 +51,14 @@ jobs:
       - name: Get branch environment variable
         shell: bash
         run: echo "GITHUB_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
-      - name: Master branch copy
-        if: env.GITHUB_BRANCH == 'master'
+      - name: Main branch copy
+        if: env.GITHUB_BRANCH == 'main'
         run: mv index.html docs/
-      - name: Copy to latest if not master
-        if: env.GITHUB_BRANCH != 'master' 
+      - name: Copy to latest if not main
+        if: env.GITHUB_BRANCH != 'main' 
         run: mkdir -p docs/latest  && cp index.html docs/latest
       - name: Move to normal release branch
-        if: env.GITHUB_BRANCH != 'master' 
+        if: env.GITHUB_BRANCH != 'main' 
         run: mkdir -p docs/$GITHUB_BRANCH  && mv index.html docs/$GITHUB_BRANCH
       # commit generated redoc to gh-pages-source  branch
       - uses: stefanzweifel/git-auto-commit-action@v4
