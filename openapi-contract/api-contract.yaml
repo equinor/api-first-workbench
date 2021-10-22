@@ -394,3 +394,10 @@ components:
           example: 'MAIN DECK AFT'
       additionalProperties: false
       required: ["locationId", "location"]
+  examples:
+    wo-update-text: 
+      summary: Append text to work order
+      value: 
+        - op: 'append'
+          path: '/text'
+          value: "Text to append\nMulti-line"      
