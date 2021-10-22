@@ -1,0 +1,344 @@
+components:
+  examples:
+    wo-update-text:
+      summary: Append text to work order
+      value:
+      - op: append
+        path: /text
+        value: 'Text to append
+
+          Multi-line'
+  parameters:
+    apiVersion:
+      description: api-version must be present in all request as part of the query
+        string
+      in: query
+      name: api-version
+      required: true
+      schema:
+        enum:
+        - v1
+        type: string
+  responses:
+    DefaultResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+      description: Response for other HTTP status codes
+    NotFound:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundDetails'
+      description: The specified resource was not found
+  schemas:
+    Location:
+      additionalProperties: false
+      properties:
+        location:
+          example: MAIN DECK AFT
+          type: string
+        locationId:
+          description: Structured location within the plant where the tag is located
+          example: MG29
+          type: string
+      required:
+      - locationId
+      - location
+      type: object
+    NotFoundDetails:
+      additionalProperties: false
+      properties:
+        status:
+          description: HTTP status code
+          example: 404
+          format: int32
+          nullable: true
+          type: integer
+        title:
+          description: Description of error
+          example: Not Found
+          nullable: true
+          type: string
+        traceId:
+          description: Request id to be used for support
+          example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+          type: string
+        type:
+          description: Reference to HTTP status definition
+          example: https://tools.ietf.org/html/rfc7231#section-6.5.4
+          nullable: true
+          type: string
+      type: object
+    ProblemDetails:
+      additionalProperties: false
+      properties:
+        errors:
+          additionalProperties:
+            additionalProperties: false
+            type: object
+          description: Detailed information about error
+          nullable: true
+          readOnly: true
+          type: object
+        status:
+          description: HTTP status code
+          example: 400
+          format: int32
+          nullable: true
+          type: integer
+        title:
+          description: Description of error
+          example: One or more validation errors occurred.
+          nullable: true
+          type: string
+        traceId:
+          description: Request id to be used for support
+          example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+          type: string
+        type:
+          description: Reference to HTTP status definition
+          example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+          nullable: true
+          type: string
+      type: object
+  securitySchemes:
+    apiKey:
+      description: Subscription key created from https://api.equinor.com
+      in: header
+      name: ocp-apim-subscription-key
+      type: apiKey
+    bearerAuth:
+      flows:
+        authorizationCode:
+          authorizationUrl: https://login.windows.net/common/oauth2/authorize?resource=0e595101-1f08-4ce0-8684-148b2e2b8e18
+          tokenUrl: https://login.microsoftonline.com/common/oauth2/token
+      type: oauth2
+externalDocs:
+  description: API documentation
+  url: https://equinor.github.io/api-first-workbench
+info:
+  contact:
+    name: Maintenance API Team - GBS IT PLA POM
+    url: https://github.com/equinor/api-first-workbench
+  description: "The {{API_NAME}} API is an open API covering the {{BUSINESS_AREA}}\
+    \ area in Equinor.\n\nThis document describes release v0.1.0. We recommend using\
+    \ documentation published at https://equinor.github.io/api-first-workbench as\
+    \ it provides the best developer experience.\nInformation on the next release\
+    \ v0.2.0 is available at [this page](https://equinor.github.io/api-first-workbench/latest/)\n\
+    \n# Introduction\nThe API is designed and built according to [Equinor's API strategy](https://github.com/equinor/api-strategy).\n\
+    \nThe API is documented in OpenAPI 3.0 format and follows REST principles.\n\n\
+    ## Terminology\nThe API will use common terminology used across the Oil&Gas industry.\n\
+    \n## API versioning\n`api-version` must be present in all request as part of the\
+    \ query string. **Requests without API version will be rejected with a HTTP 404\
+    \ response code**. The latest api-version is v1.\n\n## Subscription key\nSubscription\
+    \ key must be created from [Equinor's API Portal](https://api.equinor.com/products/corporate)\
+    \ for the consumer application  and each request must have the HTTP header `Ocp-Apim-Subscription-Key`\
+    \ present with this value.\n\n## Authentication and authorization overview\nThe\
+    \ user executing the API requests will need to authenticate with OAuth 2.0 authorization\
+    \ code flow with Equinor Azure AD as the identity provider. \n\n## Mock response\n\
+    The API allows you to get mock response for all endpoints if required. \nThis\
+    \ can be useful in special cases. For example if developers from external companies\
+    \ do not have (and should not have) authorization in Equinor's ERP system, they\
+    \ can still interact with the API to see the possibilities. \n\nAdd `mock-response=true`\
+    \ as a query parmeter to the request and the response will be mock data based\
+    \ on the OpenAPI specification.\n\n# Modelling of resources\n## Resources\nThe\
+    \ resource will be named according to common terminology used across the Oil&Gas\
+    \ industry (for example Norsok standard NS-EN 13306 and ISO 14224).\n\nExample\
+    \ of resources are /work-orders/preventive-work-orders and /plants/{plant-id}/tags\
+    \ .\n\n## Resource keys\nResources keys will indicate the resource type as part\
+    \ of the name. \nExample: `workCenterId` and `priorityId`.\n\nIf there is a common\
+    \ \"supertype resource\", the supertype will determine the naming standard of\
+    \ the key. \nExample: `FailureReports` and `ActivityReports` are both a type of\
+    \ `MaintenanceRecord`. Therefore, the key for both is `recordId`.\n\n\n## Resource\
+    \ text\nSome resources may have multi-line text describing the resource or the\
+    \ contents of it in more detail. This will always have property name `text`.\n\
+    \n## Dates\nAll date and time information are based on UTC (Universal Time Coordinated)\
+    \ and formatted according to [RFC3339](https://www.ietf.org/rfc/rfc3339.txt)\n\
+    \nThis also applies to durations, such as 1 day or 2 hours, which are encoded\
+    \ as `P0Y0M1DT0H0M0S` and `P0Y0M0DT2H0M0S`.\n\nThese values are easily compatible\
+    \ with time libraries such as [moment.js library](https://momentjs.com/docs/).\n\
+    \n## Links\nFrom some resources there will be a need to provide uri links to other\
+    \ endpoints. \nThis can for example to provide the endpoint for download of a\
+    \ binary attachment from a work order resource it belongs to.\n\nThe link will\
+    \ be defined in the data model of the resource and be grouped under the property\
+    \ name _links.\nThe name of the properties for the _links object will taken from\
+    \ [Link relations](https://www.iana.org/assignments/link-relations/link-relations.xhtml)\
+    \ defined through RFC8288 when possible. Typical link relation names are `self`\
+    \ and `enclosure`.\n\nThe uri will not include query parameters required or supported\
+    \ by the endpoint (such as api-version, include-operations etc). Subscription\
+    \ key header (`Ocp-Apim-Subscription-Key`) must also present in the subsequent\
+    \ request.\n\n```\n\"attachments\": [\n{\n    \"attachmentId\": \"H4sIAAAAAAAACqsxMDA1MDVzNDQ3srAwdHVxdDR0dDI1MjB3MjFyMzA0cqsxMgAqMTExq6mpMTQwMDSwNKoBitQ4GRsA6ZqAzOSS0qLU-LTMvJTMvHQFXQXn_IJKBQ1jTb2CvHQAwLV5WV4AAAA\"\
+    ,\n    \"fileName\": \"equipment_location.jpg\",\n    \"fileSize\": \"1636352\"\
+    ,\n    \"mimeType\": \"image/jpg\",\n    \"_links\": {\n        \"enclosure\"\
+    : \"/work-orders/preventive-work-orders/20005446/attachments/H4sIAAAAAAAACqsxMDA1MDVzNDQ3srAwdHVxdDR0dDI1MjB3MjFyMzA0cqsxMgAqMTExq6mpMTQwMDSwNKoBitQ4GRsA6ZqAzOSS0qLU-LTMvJTMvHQFXQXn_IJKBQ1jTb2CvHQAwLV5WV4AAAA\"\
+    \n    }\n}\n```\n\n# Modelling of endpoints\n## Operation - Lookup\nLookup operations\
+    \ return a single instance for the resource based on the key.\n\nThe resource\
+    \ may have related data which may or may not be relevant for a client. In order\
+    \ to indicate which related data to include, the lookup operation provides `include-...`\
+    \ query string boolean options.\nExamples: `include-operations` and `include-tasks`\n\
+    \n## Operation - Search/Filter\nClients need to retrieve a subset of all resources\
+    \ for an endpoint. Usually, the criteria are non-trivial and in many case are\
+    \ not direct properties of the resource. REST does not provide a well-defined\
+    \ pattern for these types of requests. \n\nOur approach, is to provide predefined\
+    \ filters with parameters. Each filter is documented in the OpenAPI specification.\n\
+    \nExamples: `maintenance-records/failure-reports/?api-version=v1&filter=recent-status-activation&status-id=RIDO&max-days-since-activation=1`\
+    \ and `/maintenance-orders/preventive-work-order/?api-version=v1&filter=same-maintenance-plan&work-order-id=12345678&max=5`\n\
+    \n## Operation - Update\nUpdate operations for resources will utilize a sub-set\
+    \ of the JSON Patch proposed standard. JSON Patch is described in [RFC 6902](https://tools.ietf.org/html/rfc6902)\
+    \ with a user-friendly version at [http://jsonpatch.com/](http://jsonpatch.com/).\
+    \ \n\nOur goals with using JSON Patch is to focus on the intent of the update\
+    \ and avoid common pitfalls for the client. The common pitfalls we avoid with\
+    \ JSON Patch are: \n1. Clients inadvertently resetting properties of a resource\
+    \ to an empty value. This due to the client mistakenly sending all properties\
+    \ of a resource in a HTTP PATCH request with some of them having an initial value.\n\
+    1. Clients inadvertently overwriting changes made by other users directly in the\
+    \ back-end system. This due to client mistakenly have provided properties which\
+    \ have not been changed in a HTTP PATCH request.\n\nUsing JSON Patch is straightforward.\
+    \ \n- Set the content-type to `application/json-patch+json`. \n- In the body,\
+    \ send an array of JSON Patch operations. Typically, one element pr property to\
+    \ be update for the resource\n\nAs part of the OpenAPI documentation, we will\
+    \ provide concrete examples for all update operation. In addition, the schema\
+    \ definiton for the request body defines which resource properties can be updated.\n\
+    \nExample of JSON Patch request body which replaces the value of the properties\
+    \ title and text:\n```\n[\n  {\n    \"op\": \"replace\",\n    \"path\": \"/title\"\
+    ,\n    \"value\": \"Material failure\"\n  },\n  {\n    \"op\": \"replace\",\n\
+    \    \"path\": \"/text\",\n    \"value\": \"OBSERVERT FEILTILSTAND FYLLES UT AV\
+    \ INNMELDER:\\nBeskriv feilen s\xE5 godt som mulig (legg gjerne med bilde):\\\
+    nMaterial tretthet..\\n\"\n  }\n]\n```\n\n## HTTP Response codes\nHTTP response\
+    \ codes will follow established best practice for REST services and will be documented\
+    \ in the OpenAPI specification. \n\nBelow is a list of status codes used in the\
+    \ API which the client should handle. \nCommon: \n* 400 Bad Request - The request\
+    \ is invalid. For example missing parameters in the query string\n* 401 Unauthorized\
+    \ - The request did not include an authentication token or the authentication\
+    \ token was expired or invalid\n* 403 Forbidden - User does not have sufficient\
+    \ permissions\n* 405 Method not allowed - HTTP verb not supported for requested\
+    \ resource\n* 500 Internal Server Error - Sorry, an unexpected error occured on\
+    \ our side. Let's us know and we'll get around to fix it\n* 503 Service unavailable\
+    \ - API or a service it depends on is currently not available. \n\nRead - HTTP\
+    \ GET:\n* 200 OK - The request completed successfully\n* 404 Not Found - The resource\
+    \ does not exist or an non-existing endpoint has been called\n\nCreate - HTTP\
+    \ POST: \n* 201 Created - Create of resource was successful and resource is returned\
+    \ in body\n* 400 Bad Request - The resource provided in the body is not according\
+    \ to specification\n* 409 Conflict - The creation of this resource is in conflict\
+    \ with an already existing resources\n\nCreate - HTTP PUT \n* HTTP PUT only used\
+    \ for file uploads\n* 204 No Content - Request successful but no resource returned\
+    \ in body\n* 400 Bad Request - HTTP Put failed due to file contents\n* 413 Payload\
+    \ too large - File too large\n\nUpdate - HTTP PATCH: \n* 200 OK - Update of resource\
+    \ was successful and resource is returned in body\n* 400 Bad Request - The resource\
+    \ properties to update is not according to specification\n* 409 Conflict - The\
+    \ update of this resource is in conflict with an already existing resources\n\n\
+    Delete - HTTP DELETE: \n* Currently, no endpoints using HTTP DELETE   \n\n## Pagination\n\
+    Endpoints that return multiple items will in some cases support pagination. \n\
+    This helps improve performance by only fetching the data which is necessary for\
+    \ the client. \n\nParameters `page` and `per-page` are used to define which page\
+    \ is fetched and how many records are returned in the current request. `per-page`\
+    \ will typically have a max limit defined in the endpoint's documentation. \n\n\
+    The response of a pagination request will include 3 additional HTTP headers: \n\
+    * `Total-Count`: Custom HTTP header which shows total number of items found matching\
+    \ the criteria of the request (not just in the page returned)\n* `Link`: Pagination\
+    \ data in accordance to [RFC 5988](https://datatracker.ietf.org/doc/html/rfc5988).\
+    \ This will include a link for the next, previous, first and last page.\n* `Link-Json`:\
+    \ Custom HTTP header for making the information in `Total-Count` and `Link` accessible\
+    \ in an easy to read JSON format\n\nClients are recommended to use `Link-Json`\
+    \ HTTP header to traverse the pages. Example of the data in this HTTP header:\
+    \ \n\n```\n{\n  \"totalCount\": 49,\n  \"links\": {\n      \"next\": \"https://api-test.gateway.equinor.com/maintenance-api/equipment?page=3&api-version=v1\"\
+    ,\n      \"prev\": \"https://api-test.gateway.equinor.com/maintenance-api/equipment?page=2&api-version=v1\"\
+    ,\n      \"first\": \"https://api-test.gateway.equinor.com/maintenance-api/equipment?api-version=v1\"\
+    ,\n      \"last\": \"https://api-test.gateway.equinor.com/maintenance-api/equipment?page=4&api-version=v1\"\
+    \n  }\n}\n\n```\n\nNote: For some endpoints there is a risk that individual items\
+    \ \"disappear\" between pages if data is updated in ERP system whilst the pages\
+    \ are requested.\n\n\n# Deprecation\n## Deprecation policy\nThe Maintenance API\
+    \ will use the principles of [API evolution](https://apisyouwonthate.com/blog/api-evolution-for-rest-http-apis)\
+    \ instead of introducing a new api-version on every breaking change.\n\nIn order\
+    \ to achieve this, endpoints, query parameters and resource properties can become\
+    \ deprecated and will be marked so in the OpenAPI specification.\n\nIn general,\
+    \ depcrated properties will be removed after 3 months.\nIf a client uses a deprecated\
+    \ endpoint or query parameter, the Maintenance API will in the response provide\
+    \ a Sunset HTTP header\n`Sunset: Sat, 15 May 2021 12:59:59 GMT` representing the\
+    \ removal date for the deprecated feature as specified in [RFC8594](https://tools.ietf.org/html/rfc8594).\
+    \ In addition, a HTTP header `Link: <https://equinor.github.io/maintenance-api-docs/#section/Deprecation>;\
+    \ rel=\"sunset\"` will be provided to pointing to relevant documentation.\n\n\
+    Clients must monitor these messages and take corrective actions.\n\n## Endpoints\
+    \ with deprecation\nNone\n\n# Feature requests\nFeature requests are welcomed\
+    \ and can be submitted through: \n"
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/
+  title: '{{API_NAME}} API'
+  version: 0.1.0
+  x-logo:
+    altText: Maintenance API logo
+    url: https://equinor.github.io/api-first-workbench/img/logo.png
+openapi: 3.0.1
+paths:
+  /{{API_NAME}}/plants/{plant-id}/locations:
+    get:
+      description: '### Overview
+
+        Get structured locations within the plant.
+
+        `locationId` is commonly used as metadata for tags and when creating `project-work-orders`.
+
+        '
+      operationId: GetLocations
+      parameters:
+      - in: path
+        name: plant-id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Location'
+                type: array
+          description: Success
+        '404':
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+      summary: Locations - Get
+      tags:
+      - Group 1
+security:
+- bearerAuth: []
+- apiKey: []
+servers:
+- description: Development environment
+  url: https://api-dev.gateway.equinor.com/api-first-workbench
+tags:
+- description: 'Endpoints which are introduces in the current version
+
+    '
+  name: New endpoints
+- description: "Endpoints which have been modified in the current version    \n"
+  name: Modified endpoints
+- description: 'Description for group 1
+
+    '
+  name: Group 1
+- description: 'Description for group 2.1
+
+    '
+  name: Group 2.1
+- description: 'Description for group 2.2
+
+    '
+  name: Group 2.2
+x-tagGroups:
+- name: Changes in 0.1.0
+  tags:
+  - New endpoints
+  - Modified endpoints
+- name: Group 1
+  tags:
+  - Group 1
+- name: Group 2
+  tags:
+  - Group 2.1
+  - Group 2.2
