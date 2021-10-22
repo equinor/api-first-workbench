@@ -1,0 +1,24 @@
+#Equinor has a application hosting solution called Radix https://www.radix.equinor.com/
+#The openapi-proxy-validator uses radix to host a docker image running Prism https://github.com/stoplightio/prism
+#If used outside Equinor, ignore this file and use openapi-proxy-validator\openapi_proxy_validator.Dockerfile directly
+apiVersion: radix.equinor.com/v1
+kind: RadixApplication
+metadata:
+  name: api-first-workbench
+spec:
+  build:
+    #secrets:
+    #  - NUGET_PAT
+  environments:
+    - name: test
+      build:
+        from: release/v1.0.0
+  components:
+    - name: proxy
+      dockerfileName: openapi-proxy-validator/openapi_proxy_validator.Dockerfile
+      publicPort: http
+      ports:
+        - name: http
+          port: 4010
+     # secrets:
+     #   - ClientSecret
