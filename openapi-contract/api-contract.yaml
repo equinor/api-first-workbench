@@ -268,6 +268,7 @@ paths:
         TBD
       tags:
         - Calendar
+        - New endpoints
       parameters:
         - in: path
           name: start-date
@@ -309,7 +310,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'           
-
+  /calendar/{start-date}/{end-date}/time-entries:
+    put:
+      operationId: PutTimeEntriesForCalendar
+      summary: Perform time writing for calendar (overwrites existing time entries)
+      description: |
+        ### Overview
+        TBD
+      tags:
+        - Calendar
+        - New endpoints
+      parameters:
+        - in: path
+          name: start-date
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2021-11-01'
+        - in: path
+          name: end-date
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2021-11-01'
+      requestBody:
+        description: Time entries
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:  
+                $ref: '#/components/schemas/TimeEntryCreate'
+            #examples:
+            #  calendar-time-entries-put:
+            #    $ref: '#/components/examples/calendar-time-entries-put'        
+      responses:
+        '204': 
+          description: Successful - No content. Lookup result using `GET /calendar/{start-date}/{end-date}`
+        '400':
+          description: Bad request (for example invalid costObjectId)
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'          
+        default:
+          description: Unexpected error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails' 
 
 components:
   parameters:
@@ -489,6 +541,49 @@ components:
           type: string
           description: Description of the cost object
           example: "Project XYZ"
+          
+    TimeEntryCreate:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          description: Time entry date
+          example: '2019-05-22'
+        hours: 
+          type: number
+          format: double
+          description: Number of hours worked
+          minimum: 0
+          maximum: 24
+          example: 8.0
+        costObjectTypeId:
+          $ref: '#/components/schemas/CostObjectTypes'
+        costObjectId:
+          type: string
+          description: Cost object identifier
+          example: 'C.BAX.30.xxx'
+        costSubObjectId:
+          type: string
+          description: Secondary cost object identifier. Not use for all cost object types.
+          example: '0100'
+        comment:
+          type: string
+          description: Comment for time entry
+          example: 'Analysis of task xyz'
+          maxLength: 40          
+      required:
+        - date
+        - hours
+        - costObjectTypeId
+        - costObjectId
+          
+    CostObjectTypes:
+      description: Type of cost object
+      type: string
+      enum:
+        - 'wbs'
+        - 'network'
   examples:
     wo-update-text: 
       summary: Append text to work order
