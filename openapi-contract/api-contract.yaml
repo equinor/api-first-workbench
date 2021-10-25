@@ -457,6 +457,43 @@ paths:
           content: 
             application/json:
               schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    delete:
+      operationId: DeleteTimeEntry
+      summary: Delete single time entry
+      description: |
+        ## Overview
+        Delete single time entry.
+      tags:
+        - Time entries
+        - New endpoints
+      parameters:
+        - in: path
+          name: time-entry-id
+          required: true
+          schema: 
+            type: string
+            example: '154632395'
+      responses:
+        '204':
+          description: No content - Time entry deleted
+        '404':
+          description: Not found - Time entry does not exist for logged in user
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict - For example if the time entry is too far back in time and cannot be deleted
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'                 
+        default:
+          description: Unexpected error
+          content: 
+            application/json:
+              schema:
                 $ref: '#/components/schemas/ProblemDetails'                
 
 components:
