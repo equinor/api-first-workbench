@@ -235,32 +235,34 @@ tags:
       Endpoints which have been modified in the current version    
   - name: Calendar
     description: |
-      Description for calendar
-  - name: Group 2.1
+      Calendar represent a date range to perform time writing for based on expecations in the work scehdule
+  - name: Time entries
     description: |
-      Description for group 2.1
-  - name: Group 2.2
+      Time entry represent hours registered on a specific day towards a cost object
+  - name: Cost objects
     description: |
-      Description for group 2.2
+      Cost object represent how the cost for each time entry is allocated
 
 x-tagGroups:
-  - name: Changes in 0.1.0
+  - name: Changes in 1.0.0
     tags:
       - New endpoints
       - Modified endpoints
   - name: Calendar
     tags:
       - Calendar
-  - name: Group 2
+  - name: Time entries
     tags:
-      - Group 2.1
-      - Group 2.2
+      - Time entries
+  - name: Cost objects
+    tags:
+      - Cost objects     
 
 paths:
-  /hours-for-month/{year}/{month}:
+  /calendar/{start-date}/{end-date}:
     get:
-      operationId: LookupHoursForMonth
-      summary: Lookup hours for a month for logged on user
+      operationId: LookupCalendarByDateRange
+      summary: Lookup calendar for a date range
       description: |
         ### Overview
         TBD
@@ -268,23 +270,22 @@ paths:
         - Calendar
       parameters:
         - in: path
-          name: year
+          name: start-date
           required: true
           schema:
-            type: number
-            format: integer
-            example: 2019
+            type: string
+            format: date
+            example: '2021-11-01'
         - in: path
-          name: month
+          name: end-date
           required: true
           schema:
-            type: number
-            format: integer
-            example: 5
-            minimum: 1
-            maximum: 12
+            type: string
+            format: date
+            example: '2021-11-01'            
         - in: query
           name: include-time-entries
+          description: Include all time entries in the calendar
           required: false
           schema:
             type: boolean
@@ -294,58 +295,20 @@ paths:
           content: 
             application/json:
               schema:
-                $ref: '#/components/schemas/CalendarDay'
+                $ref: '#/components/schemas/Calendar'
           description: Request successful
-        '403':
-          description: User is not authorized
+        '400':
+          description: Bad request (for example if start-date is before end-date)
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'          
         default:
           description: Unexpected error
-
-  /hours-for-week/{year}/{week}:
-    get:
-      operationId: LookupHoursForMonth
-      summary: Lookup hours for a month for logged on user
-      description: |
-        ### Overview
-        TBD
-      tags:
-        - Calendar
-      parameters:
-        - in: path
-          name: year
-          required: true
-          schema:
-            type: number
-            format: integer
-            example: 2021
-        - in: path
-          name: week
-          required: true
-          schema:
-            type: number
-            format: integer
-            example: 5
-            minimum: 1
-            maximum: 53
-        - in: query
-          name: include-time-entries
-          required: false
-          schema:
-            type: boolean
-            default: true         
-      responses:
-        '200':
-          description: Success
-          content:
-            'application/json':
+          content: 
+            application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CalendarDay'
-        '404':
-          $ref: '#/components/responses/NotFound'  
-        default:
-            $ref: '#/components/responses/DefaultResponse'
+                $ref: '#/components/schemas/ProblemDetails'           
 
 
 components:
@@ -442,7 +405,26 @@ components:
               type: string
               description: Request id to be used for support
               example: '00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00'
-          additionalProperties: false  
+          additionalProperties: false
+          
+    Calendar:
+      type: object
+      properties:  
+        startDate:
+          type: string
+          format: date
+          description: Start date of the calendar. Key of calendar together with the endDate
+          example: "2021-11-04"
+        endDate:
+          type: string
+          format: date
+          description: End date of the calendar. Key of calendar together with the startDate
+          example: "2021-11-10"
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarDay'
+            
     CalendarDay:
       type: object
       properties:  
@@ -491,7 +473,7 @@ components:
         comment:
           type: string
           description: Comment for time entry
-        costObjectType:
+        costObjectTypeId:
           type: string
           description: Type of object for the cost object of the time entry
           enum: ["wbs", "network"]
@@ -499,7 +481,7 @@ components:
           type: string
           description: Cost object identificator (wbs id or network number)
           example: "C.BAX.30.xxx"
-        costSubobjectId:
+        costSubObjectId:
           type: string
           description: Subobject for cost object. Only used when costObjectType is network and represents the network activity number
           example: ""
