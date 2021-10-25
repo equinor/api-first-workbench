@@ -496,6 +496,52 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'                
 
+  /time-entries:
+    post:
+      operationId: CreateTimeEntry
+      summary: Create single time entry
+      tags:
+        - Time entries
+        - New endpoints
+      description: |
+        ## Overview
+        Create single time entry.
+      requestBody:
+        description: Time entry update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeEntryCreate'
+            #examples:
+            #  time-entries-create-all:
+            #    $ref: '#/components/examples/time-entries-create-all'
+      responses:
+        '201':
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntry'
+          description: Created
+        '400':
+          description: Bad request - For example too many hours
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict - For example if the date is too far back in time and cannot be used
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        default:
+          description: Unexpected error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
 components:
   parameters:
     apiVersion:
