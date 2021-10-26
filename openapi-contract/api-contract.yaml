@@ -658,7 +658,7 @@ components:
     TimeEntry:
       type: object
       properties:
-        id: 
+        timeEntryId: 
           type: string
           description: Unique id for time entry
           example: '154632395'
@@ -673,7 +673,7 @@ components:
           description: Number of hours worked
           minimum: 0
           maximum: 24
-          example: 8.0
+          example: 7.5
         costObjectTypeId:
           $ref: '#/components/schemas/CostObjectTypes'
         costObjectId:
@@ -759,13 +759,13 @@ components:
     CostObject:
       type: object
       properties:
-        id: 
+        costObjectId: 
           type: string
           description: Cost object id
           example: "9000000"
         type:
           $ref: '#/components/schemas/CostObjectTypes'
-        description:
+        costObject:
           type: string
           description: Description of the cost object
           example: "Project XYZ"
@@ -781,11 +781,11 @@ components:
     CostSubObject:
       type: object
       properties:
-        id: 
+        subCostObjectId: 
           type: string
           description: Cost subobject id
           example: "0100"
-        costObjectDescription:
+        subCostObject:
           type: string
           description: Description of the cost subobject
           example: "Implement API"
