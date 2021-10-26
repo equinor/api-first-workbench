@@ -5,10 +5,6 @@ name: OpenAPI prepare for APIM
 on:
   #Triggered manually
   workflow_dispatch:
-  push:
-    paths:
-      - 'openapi-contract/*.yaml'
-      - '.github/workflows/scrub-examples.yml'
   # Triggered when github action in openapi_prepare_for_prism.yml is completed (regardless of result)
   workflow_run:
     workflows: ["OpenAPI prepare for Prism proxy validation"]

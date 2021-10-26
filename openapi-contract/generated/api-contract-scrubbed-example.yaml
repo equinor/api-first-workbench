@@ -71,11 +71,11 @@ components:
       type: object
     CostObject:
       properties:
-        description:
+        costObject:
           description: Description of the cost object
           example: Project XYZ
           type: string
-        id:
+        costObjectId:
           description: Cost object id
           example: '9000000'
           type: string
@@ -98,17 +98,17 @@ components:
       type: string
     CostSubObject:
       properties:
-        costObjectDescription:
-          description: Description of the cost subobject
-          example: Implement API
-          type: string
-        id:
-          description: Cost subobject id
-          example: '0100'
-          type: string
         isOpenForTimeWriting:
           description: Is the cost subobject open for time writing
           type: boolean
+        subCostObject:
+          description: Description of the cost subobject
+          example: Implement API
+          type: string
+        subCostObjectId:
+          description: Cost subobject id
+          example: '0100'
+          type: string
       type: object
     NotFoundDetails:
       additionalProperties: false
@@ -193,12 +193,12 @@ components:
           type: string
         hours:
           description: Number of hours worked
-          example: 8.0
+          example: 7.5
           format: double
           maximum: 24
           minimum: 0
           type: number
-        id:
+        timeEntryId:
           description: Unique id for time entry
           example: '154632395'
           type: string
