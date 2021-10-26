@@ -3,12 +3,23 @@ name: OpenAPI prepare for APIM
 # Therefore, we use a python script to remove the examples and save the new file as openapi-contract/api-contract-scrubbed-example.yaml
 
 on:
-  #Triggered on push for all branches or manually
+  #Triggered manually
   workflow_dispatch:
   push:
     paths:
       - 'openapi-contract/*.yaml'
       - '.github/workflows/scrub-examples.yml'
+  # Triggered when github action in openapi_prepare_for_prism.yml is completed (regardless of result)
+  workflow_run:
+    workflows: ["OpenAPI prepare for Prism proxy validation"]
+    types:
+      - completed
+  
+  # Not used anymore. If we use push: trigger we get errors in openapi_prepare_for_prism.yml due to new commits
+  #push:
+  #  paths:
+  #    - 'openapi-contract/*.yaml'
+  #    - '.github/workflows/openapi_prepare_for_apim.yml'
 jobs:
   scrub-examples:
     runs-on: ubuntu-latest
