@@ -250,7 +250,14 @@ paths:
       summary: Perform time writing for calendar (overwrites existing time entries)
       description: |
         ### Overview
-        TBD
+        Perform time writing by supplying all time entries for a given calendar period. 
+        
+        It's also possible to change individual time entries via endpoints `POST /time-entries`,`PATCH /time-entries/{time-entry-id}` and `DELETE /time-entries/{time-entry-id}`.
+        
+        ### Important information
+        This operation overwrites all existing time writing in the given calendar period.  
+        
+        If there are errors for one or more of the time entries, none of them will be updated.
       tags:
         - Calendar
         - New endpoints
