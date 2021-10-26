@@ -2,10 +2,10 @@ openapi: 3.0.1
 info:
   title: '{{API_NAME}} API'
   description: |
-    The {{API_NAME}} API is an open API covering the {{BUSINESS_AREA}} area in Equinor.
+    The {{API_NAME}} API is an open API covering the {{BUSINESS_AREA}} area.
 
-    This document describes release v0.1.0. We recommend using documentation published at https://equinor.github.io/api-first-workbench as it provides the best developer experience.
-    Information on the next release v0.2.0 is available at [this page](https://equinor.github.io/api-first-workbench/latest/)
+    This document describes release v1.0.0. We recommend using documentation published at https://equinor.github.io/api-first-workbench as it provides the best developer experience.
+    Information on the next release v1.1.0 is available at [this page](https://equinor.github.io/api-first-workbench/latest/)
 
     # Introduction
     The API is designed and built according to [Equinor's API strategy](https://github.com/equinor/api-strategy).
@@ -18,35 +18,24 @@ info:
     ## API versioning
     `api-version` must be present in all request as part of the query string. **Requests without API version will be rejected with a HTTP 404 response code**. The latest api-version is v1.
     
+    The `api-version` will stay stable over time as the API follows the principles of [API evolution](https://apisyouwonthate.com/blog/api-evolution-for-rest-http-apis)
+    
     ## Subscription key
     Subscription key must be created from [Equinor's API Portal](https://api.equinor.com/products/corporate) for the consumer application  and each request must have the HTTP header `Ocp-Apim-Subscription-Key` present with this value.
     
     ## Authentication and authorization overview
     The user executing the API requests will need to authenticate with OAuth 2.0 authorization code flow with Equinor Azure AD as the identity provider. 
 
-    ## Mock response
-    The API allows you to get mock response for all endpoints if required. 
-    This can be useful in special cases. For example if developers from external companies do not have (and should not have) authorization in Equinor's ERP system, they can still interact with the API to see the possibilities. 
-    
-    Add `mock-response=true` as a query parmeter to the request and the response will be mock data based on the OpenAPI specification.
-
     # Modelling of resources
     ## Resources
     The resource will be named according to common terminology used across the Oil&Gas industry (for example Norsok standard NS-EN 13306 and ISO 14224).
     
-    Example of resources are /work-orders/preventive-work-orders and /plants/{plant-id}/tags .
+    Example of resources are `/time-entries` and `/cost-objects`.
     
     ## Resource keys
     Resources keys will indicate the resource type as part of the name. 
-    Example: `workCenterId` and `priorityId`.
+    Example: `timeEntryId` and `costObjectId`.
 
-    If there is a common "supertype resource", the supertype will determine the naming standard of the key. 
-    Example: `FailureReports` and `ActivityReports` are both a type of `MaintenanceRecord`. Therefore, the key for both is `recordId`.
-    
-    
-    ## Resource text
-    Some resources may have multi-line text describing the resource or the contents of it in more detail. This will always have property name `text`.
-    
     ## Dates
     All date and time information are based on UTC (Universal Time Coordinated) and formatted according to [RFC3339](https://www.ietf.org/rfc/rfc3339.txt)
 
@@ -54,41 +43,17 @@ info:
     
     These values are easily compatible with time libraries such as [moment.js library](https://momentjs.com/docs/).
     
-    ## Links
-    From some resources there will be a need to provide uri links to other endpoints. 
-    This can for example to provide the endpoint for download of a binary attachment from a work order resource it belongs to.
-    
-    The link will be defined in the data model of the resource and be grouped under the property name _links.
-    The name of the properties for the _links object will taken from [Link relations](https://www.iana.org/assignments/link-relations/link-relations.xhtml) defined through RFC8288 when possible. Typical link relation names are `self` and `enclosure`.
-    
-    The uri will not include query parameters required or supported by the endpoint (such as api-version, include-operations etc). Subscription key header (`Ocp-Apim-Subscription-Key`) must also present in the subsequent request.
-    
-    ```
-    "attachments": [
-    {
-        "attachmentId": "H4sIAAAAAAAACqsxMDA1MDVzNDQ3srAwdHVxdDR0dDI1MjB3MjFyMzA0cqsxMgAqMTExq6mpMTQwMDSwNKoBitQ4GRsA6ZqAzOSS0qLU-LTMvJTMvHQFXQXn_IJKBQ1jTb2CvHQAwLV5WV4AAAA",
-        "fileName": "equipment_location.jpg",
-        "fileSize": "1636352",
-        "mimeType": "image/jpg",
-        "_links": {
-            "enclosure": "/work-orders/preventive-work-orders/20005446/attachments/H4sIAAAAAAAACqsxMDA1MDVzNDQ3srAwdHVxdDR0dDI1MjB3MjFyMzA0cqsxMgAqMTExq6mpMTQwMDSwNKoBitQ4GRsA6ZqAzOSS0qLU-LTMvJTMvHQFXQXn_IJKBQ1jTb2CvHQAwLV5WV4AAAA"
-        }
-    }
-    ```
-    
     # Modelling of endpoints
     ## Operation - Lookup
     Lookup operations return a single instance for the resource based on the key.
     
-    The resource may have related data which may or may not be relevant for a client. In order to indicate which related data to include, the lookup operation provides `include-...` query string boolean options.
-    Examples: `include-operations` and `include-tasks`
+    The resource may have related data which may or may not be relevant for a client. In order to indicate which related data to include, the lookup operation may provide `include-...` query string boolean options.
+    Example: `include-time-entries`
     
     ## Operation - Search/Filter
     Clients need to retrieve a subset of all resources for an endpoint. Usually, the criteria are non-trivial and in many case are not direct properties of the resource. REST does not provide a well-defined pattern for these types of requests. 
     
     Our approach, is to provide predefined filters with parameters. Each filter is documented in the OpenAPI specification.
-    
-    Examples: `maintenance-records/failure-reports/?api-version=v1&filter=recent-status-activation&status-id=RIDO&max-days-since-activation=1` and `/maintenance-orders/preventive-work-order/?api-version=v1&filter=same-maintenance-plan&work-order-id=12345678&max=5`
     
     ## Operation - Update
     Update operations for resources will utilize a sub-set of the JSON Patch proposed standard. JSON Patch is described in [RFC 6902](https://tools.ietf.org/html/rfc6902) with a user-friendly version at [http://jsonpatch.com/](http://jsonpatch.com/). 
@@ -108,13 +73,13 @@ info:
     [
       {
         "op": "replace",
-        "path": "/title",
-        "value": "Material failure"
+        "path": "/comment ",
+        "value": "New comment"
       },
       {
         "op": "replace",
-        "path": "/text",
-        "value": "OBSERVERT FEILTILSTAND FYLLES UT AV INNMELDER:\nBeskriv feilen så godt som mulig (legg gjerne med bilde):\nMaterial tretthet..\n"
+        "path": "/hours",
+        "value": 4
       }
     ]
     ```
@@ -140,11 +105,8 @@ info:
     * 400 Bad Request - The resource provided in the body is not according to specification
     * 409 Conflict - The creation of this resource is in conflict with an already existing resources
     
-    Create - HTTP PUT 
-    * HTTP PUT only used for file uploads
+    Create - HTTP PUT:
     * 204 No Content - Request successful but no resource returned in body
-    * 400 Bad Request - HTTP Put failed due to file contents
-    * 413 Payload too large - File too large
     
     Update - HTTP PATCH: 
     * 200 OK - Update of resource was successful and resource is returned in body
@@ -152,45 +114,17 @@ info:
     * 409 Conflict - The update of this resource is in conflict with an already existing resources
     
     Delete - HTTP DELETE: 
-    * Currently, no endpoints using HTTP DELETE   
-    
-    ## Pagination
-    Endpoints that return multiple items will in some cases support pagination. 
-    This helps improve performance by only fetching the data which is necessary for the client. 
-    
-    Parameters `page` and `per-page` are used to define which page is fetched and how many records are returned in the current request. `per-page` will typically have a max limit defined in the endpoint's documentation. 
-    
-    The response of a pagination request will include 3 additional HTTP headers: 
-    * `Total-Count`: Custom HTTP header which shows total number of items found matching the criteria of the request (not just in the page returned)
-    * `Link`: Pagination data in accordance to [RFC 5988](https://datatracker.ietf.org/doc/html/rfc5988). This will include a link for the next, previous, first and last page.
-    * `Link-Json`: Custom HTTP header for making the information in `Total-Count` and `Link` accessible in an easy to read JSON format
-    
-    Clients are recommended to use `Link-Json` HTTP header to traverse the pages. Example of the data in this HTTP header: 
-    
-    ```
-    {
-      "totalCount": 49,
-      "links": {
-          "next": "https://api-test.gateway.equinor.com/maintenance-api/equipment?page=3&api-version=v1",
-          "prev": "https://api-test.gateway.equinor.com/maintenance-api/equipment?page=2&api-version=v1",
-          "first": "https://api-test.gateway.equinor.com/maintenance-api/equipment?api-version=v1",
-          "last": "https://api-test.gateway.equinor.com/maintenance-api/equipment?page=4&api-version=v1"
-      }
-    }
-    
-    ```
-    
-    Note: For some endpoints there is a risk that individual items "disappear" between pages if data is updated in ERP system whilst the pages are requested.
-    
+    * 204 No Content - Request successful but no resource returned in body
+    * 409 Conflict - The deletion of this resource is not possible
     
     # Deprecation
     ## Deprecation policy
-    The Maintenance API will use the principles of [API evolution](https://apisyouwonthate.com/blog/api-evolution-for-rest-http-apis) instead of introducing a new api-version on every breaking change.
+    The API will use the principles of [API evolution](https://apisyouwonthate.com/blog/api-evolution-for-rest-http-apis) instead of introducing a new api-version on every breaking change.
     
     In order to achieve this, endpoints, query parameters and resource properties can become deprecated and will be marked so in the OpenAPI specification.
     
     In general, depcrated properties will be removed after 3 months.
-    If a client uses a deprecated endpoint or query parameter, the Maintenance API will in the response provide a Sunset HTTP header
+    If a client uses a deprecated endpoint or query parameter, the API will in the response provide a Sunset HTTP header
     `Sunset: Sat, 15 May 2021 12:59:59 GMT` representing the removal date for the deprecated feature as specified in [RFC8594](https://tools.ietf.org/html/rfc8594). In addition, a HTTP header `Link: <https://equinor.github.io/maintenance-api-docs/#section/Deprecation>; rel="sunset"` will be provided to pointing to relevant documentation.
     
     Clients must monitor these messages and take corrective actions.
@@ -200,7 +134,7 @@ info:
 
     # Feature requests
     Feature requests are welcomed and can be submitted through: 
-  version: "0.1.0"
+  version: "1.0.0"
 
   contact:
     name: Maintenance API Team - GBS IT PLA POM
