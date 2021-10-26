@@ -15,15 +15,14 @@ def add_maintenance_api_to_path(yaml_path):
         except yaml.YAMLError as exc:
             print(exc)
 
-# Add the {{API_NAME}} defined in API Management to all paths
+# Add the api-first-workbench prefix defined in API Management to all paths
 def prepend_paths(oas):
     if type(oas) is not dict:
         return
     paths = oas['paths']
     for key in list(paths):
-        paths['/{{API_NAME}}' + key] = paths[key]
+        paths['/api-first-workbench' + key] = paths[key]
         del paths[key]
-        # dictionary['/maintenance-api'+key] = dictionary.pop(key)
 
 
 if __name__ == '__main__':
