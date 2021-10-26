@@ -758,7 +758,7 @@ info:
     url: https://equinor.github.io/api-first-workbench/img/logo.png
 openapi: 3.0.1
 paths:
-  /{{API_NAME}}/calendar/{start-date}/{end-date}:
+  /api-first-workbench/calendar/{start-date}/{end-date}:
     get:
       description: |
         ### Overview
@@ -954,7 +954,7 @@ paths:
       tags:
         - Calendar
         - New endpoints
-  /{{API_NAME}}/calendar/{start-date}/{end-date}/time-entries:
+  /api-first-workbench/calendar/{start-date}/{end-date}/time-entries:
     put:
       description: >
         ### Overview
@@ -1090,7 +1090,7 @@ paths:
       tags:
         - Calendar
         - New endpoints
-  /{{API_NAME}}/cost-objects/{cost-object-id}:
+  /api-first-workbench/cost-objects/{cost-object-id}:
     get:
       description: |
         ### Overview
@@ -1223,7 +1223,7 @@ paths:
       tags:
         - Cost objects
         - New endpoints
-  /{{API_NAME}}/time-entries:
+  /api-first-workbench/time-entries:
     post:
       description: |
         ## Overview
@@ -1436,7 +1436,7 @@ paths:
       tags:
         - Time entries
         - New endpoints
-  /{{API_NAME}}/time-entries/{time-entry-id}:
+  /api-first-workbench/time-entries/{time-entry-id}:
     delete:
       description: |
         ## Overview

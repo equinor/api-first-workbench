@@ -397,7 +397,7 @@ info:
     url: https://equinor.github.io/api-first-workbench/img/logo.png
 openapi: 3.0.1
 paths:
-  /{{API_NAME}}/calendar/{start-date}/{end-date}:
+  /api-first-workbench/calendar/{start-date}/{end-date}:
     get:
       description: '### Overview
 
@@ -450,7 +450,7 @@ paths:
       tags:
       - Calendar
       - New endpoints
-  /{{API_NAME}}/calendar/{start-date}/{end-date}/time-entries:
+  /api-first-workbench/calendar/{start-date}/{end-date}/time-entries:
     put:
       description: "### Overview\nPerform time writing by supplying all time entries\
         \ for a given calendar period. \n\nIt's also possible to change individual\
@@ -503,7 +503,7 @@ paths:
       tags:
       - Calendar
       - New endpoints
-  /{{API_NAME}}/cost-objects/{cost-object-id}:
+  /api-first-workbench/cost-objects/{cost-object-id}:
     get:
       description: "### Overview\nLookup a single cost object. \n\nThe cost object\
         \ is used when creating a new time entry.\n"
@@ -538,7 +538,7 @@ paths:
       tags:
       - Cost objects
       - New endpoints
-  /{{API_NAME}}/time-entries:
+  /api-first-workbench/time-entries:
     post:
       description: '## Overview
 
@@ -583,7 +583,7 @@ paths:
       tags:
       - Time entries
       - New endpoints
-  /{{API_NAME}}/time-entries/{time-entry-id}:
+  /api-first-workbench/time-entries/{time-entry-id}:
     delete:
       description: '## Overview
 
