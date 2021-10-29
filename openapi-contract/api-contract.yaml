@@ -1,11 +1,12 @@
 openapi: 3.0.1
 info:
-  title: '{{API_NAME}} API'
+  title: 'Timewriting API'
   description: |
-    The {{API_NAME}} API is an open API covering the {{BUSINESS_AREA}} area in Equinor.
+    The Timewriting API is an open API covering the HR area.
+    It's an example API used to demonstrate the [api-first-workbench](https://github.com/equinor/api-first-workbench) and has not been implemented.
 
-    This document describes release v0.1.0. We recommend using documentation published at https://equinor.github.io/api-first-workbench as it provides the best developer experience.
-    Information on the next release v0.2.0 is available at [this page](https://equinor.github.io/api-first-workbench/latest/)
+    This document describes release v1.0.0. We recommend using documentation published at https://equinor.github.io/api-first-workbench as it provides the best developer experience.
+    Information on the next release v1.1.0 is available at [this page](https://equinor.github.io/api-first-workbench/latest/)
 
     # Introduction
     The API is designed and built according to [Equinor's API strategy](https://github.com/equinor/api-strategy).
@@ -18,35 +19,24 @@ info:
     ## API versioning
     `api-version` must be present in all request as part of the query string. **Requests without API version will be rejected with a HTTP 404 response code**. The latest api-version is v1.
     
+    The `api-version` will stay stable over time as the API follows the principles of [API evolution](https://apisyouwonthate.com/blog/api-evolution-for-rest-http-apis)
+    
     ## Subscription key
     Subscription key must be created from [Equinor's API Portal](https://api.equinor.com/products/corporate) for the consumer application  and each request must have the HTTP header `Ocp-Apim-Subscription-Key` present with this value.
     
     ## Authentication and authorization overview
     The user executing the API requests will need to authenticate with OAuth 2.0 authorization code flow with Equinor Azure AD as the identity provider. 
 
-    ## Mock response
-    The API allows you to get mock response for all endpoints if required. 
-    This can be useful in special cases. For example if developers from external companies do not have (and should not have) authorization in Equinor's ERP system, they can still interact with the API to see the possibilities. 
-    
-    Add `mock-response=true` as a query parmeter to the request and the response will be mock data based on the OpenAPI specification.
-
     # Modelling of resources
     ## Resources
     The resource will be named according to common terminology used across the Oil&Gas industry (for example Norsok standard NS-EN 13306 and ISO 14224).
     
-    Example of resources are /work-orders/preventive-work-orders and /plants/{plant-id}/tags .
+    Example of resources are `/time-entries` and `/cost-objects`.
     
     ## Resource keys
     Resources keys will indicate the resource type as part of the name. 
-    Example: `workCenterId` and `priorityId`.
+    Example: `timeEntryId` and `costObjectId`.
 
-    If there is a common "supertype resource", the supertype will determine the naming standard of the key. 
-    Example: `FailureReports` and `ActivityReports` are both a type of `MaintenanceRecord`. Therefore, the key for both is `recordId`.
-    
-    
-    ## Resource text
-    Some resources may have multi-line text describing the resource or the contents of it in more detail. This will always have property name `text`.
-    
     ## Dates
     All date and time information are based on UTC (Universal Time Coordinated) and formatted according to [RFC3339](https://www.ietf.org/rfc/rfc3339.txt)
 
@@ -54,41 +44,17 @@ info:
     
     These values are easily compatible with time libraries such as [moment.js library](https://momentjs.com/docs/).
     
-    ## Links
-    From some resources there will be a need to provide uri links to other endpoints. 
-    This can for example to provide the endpoint for download of a binary attachment from a work order resource it belongs to.
-    
-    The link will be defined in the data model of the resource and be grouped under the property name _links.
-    The name of the properties for the _links object will taken from [Link relations](https://www.iana.org/assignments/link-relations/link-relations.xhtml) defined through RFC8288 when possible. Typical link relation names are `self` and `enclosure`.
-    
-    The uri will not include query parameters required or supported by the endpoint (such as api-version, include-operations etc). Subscription key header (`Ocp-Apim-Subscription-Key`) must also present in the subsequent request.
-    
-    ```
-    "attachments": [
-    {
-        "attachmentId": "H4sIAAAAAAAACqsxMDA1MDVzNDQ3srAwdHVxdDR0dDI1MjB3MjFyMzA0cqsxMgAqMTExq6mpMTQwMDSwNKoBitQ4GRsA6ZqAzOSS0qLU-LTMvJTMvHQFXQXn_IJKBQ1jTb2CvHQAwLV5WV4AAAA",
-        "fileName": "equipment_location.jpg",
-        "fileSize": "1636352",
-        "mimeType": "image/jpg",
-        "_links": {
-            "enclosure": "/work-orders/preventive-work-orders/20005446/attachments/H4sIAAAAAAAACqsxMDA1MDVzNDQ3srAwdHVxdDR0dDI1MjB3MjFyMzA0cqsxMgAqMTExq6mpMTQwMDSwNKoBitQ4GRsA6ZqAzOSS0qLU-LTMvJTMvHQFXQXn_IJKBQ1jTb2CvHQAwLV5WV4AAAA"
-        }
-    }
-    ```
-    
     # Modelling of endpoints
     ## Operation - Lookup
     Lookup operations return a single instance for the resource based on the key.
     
-    The resource may have related data which may or may not be relevant for a client. In order to indicate which related data to include, the lookup operation provides `include-...` query string boolean options.
-    Examples: `include-operations` and `include-tasks`
+    The resource may have related data which may or may not be relevant for a client. In order to indicate which related data to include, the lookup operation may provide `include-...` query string boolean options.
+    Example: `include-time-entries`
     
     ## Operation - Search/Filter
     Clients need to retrieve a subset of all resources for an endpoint. Usually, the criteria are non-trivial and in many case are not direct properties of the resource. REST does not provide a well-defined pattern for these types of requests. 
     
     Our approach, is to provide predefined filters with parameters. Each filter is documented in the OpenAPI specification.
-    
-    Examples: `maintenance-records/failure-reports/?api-version=v1&filter=recent-status-activation&status-id=RIDO&max-days-since-activation=1` and `/maintenance-orders/preventive-work-order/?api-version=v1&filter=same-maintenance-plan&work-order-id=12345678&max=5`
     
     ## Operation - Update
     Update operations for resources will utilize a sub-set of the JSON Patch proposed standard. JSON Patch is described in [RFC 6902](https://tools.ietf.org/html/rfc6902) with a user-friendly version at [http://jsonpatch.com/](http://jsonpatch.com/). 
@@ -108,13 +74,13 @@ info:
     [
       {
         "op": "replace",
-        "path": "/title",
-        "value": "Material failure"
+        "path": "/comment ",
+        "value": "New comment"
       },
       {
         "op": "replace",
-        "path": "/text",
-        "value": "OBSERVERT FEILTILSTAND FYLLES UT AV INNMELDER:\nBeskriv feilen så godt som mulig (legg gjerne med bilde):\nMaterial tretthet..\n"
+        "path": "/hours",
+        "value": 4
       }
     ]
     ```
@@ -140,11 +106,8 @@ info:
     * 400 Bad Request - The resource provided in the body is not according to specification
     * 409 Conflict - The creation of this resource is in conflict with an already existing resources
     
-    Create - HTTP PUT 
-    * HTTP PUT only used for file uploads
+    Create - HTTP PUT:
     * 204 No Content - Request successful but no resource returned in body
-    * 400 Bad Request - HTTP Put failed due to file contents
-    * 413 Payload too large - File too large
     
     Update - HTTP PATCH: 
     * 200 OK - Update of resource was successful and resource is returned in body
@@ -152,45 +115,17 @@ info:
     * 409 Conflict - The update of this resource is in conflict with an already existing resources
     
     Delete - HTTP DELETE: 
-    * Currently, no endpoints using HTTP DELETE   
-    
-    ## Pagination
-    Endpoints that return multiple items will in some cases support pagination. 
-    This helps improve performance by only fetching the data which is necessary for the client. 
-    
-    Parameters `page` and `per-page` are used to define which page is fetched and how many records are returned in the current request. `per-page` will typically have a max limit defined in the endpoint's documentation. 
-    
-    The response of a pagination request will include 3 additional HTTP headers: 
-    * `Total-Count`: Custom HTTP header which shows total number of items found matching the criteria of the request (not just in the page returned)
-    * `Link`: Pagination data in accordance to [RFC 5988](https://datatracker.ietf.org/doc/html/rfc5988). This will include a link for the next, previous, first and last page.
-    * `Link-Json`: Custom HTTP header for making the information in `Total-Count` and `Link` accessible in an easy to read JSON format
-    
-    Clients are recommended to use `Link-Json` HTTP header to traverse the pages. Example of the data in this HTTP header: 
-    
-    ```
-    {
-      "totalCount": 49,
-      "links": {
-          "next": "https://api-test.gateway.equinor.com/maintenance-api/equipment?page=3&api-version=v1",
-          "prev": "https://api-test.gateway.equinor.com/maintenance-api/equipment?page=2&api-version=v1",
-          "first": "https://api-test.gateway.equinor.com/maintenance-api/equipment?api-version=v1",
-          "last": "https://api-test.gateway.equinor.com/maintenance-api/equipment?page=4&api-version=v1"
-      }
-    }
-    
-    ```
-    
-    Note: For some endpoints there is a risk that individual items "disappear" between pages if data is updated in ERP system whilst the pages are requested.
-    
+    * 204 No Content - Request successful but no resource returned in body
+    * 409 Conflict - The deletion of this resource is not possible
     
     # Deprecation
     ## Deprecation policy
-    The Maintenance API will use the principles of [API evolution](https://apisyouwonthate.com/blog/api-evolution-for-rest-http-apis) instead of introducing a new api-version on every breaking change.
+    The API will use the principles of [API evolution](https://apisyouwonthate.com/blog/api-evolution-for-rest-http-apis) instead of introducing a new api-version on every breaking change.
     
     In order to achieve this, endpoints, query parameters and resource properties can become deprecated and will be marked so in the OpenAPI specification.
     
     In general, depcrated properties will be removed after 3 months.
-    If a client uses a deprecated endpoint or query parameter, the Maintenance API will in the response provide a Sunset HTTP header
+    If a client uses a deprecated endpoint or query parameter, the API will in the response provide a Sunset HTTP header
     `Sunset: Sat, 15 May 2021 12:59:59 GMT` representing the removal date for the deprecated feature as specified in [RFC8594](https://tools.ietf.org/html/rfc8594). In addition, a HTTP header `Link: <https://equinor.github.io/maintenance-api-docs/#section/Deprecation>; rel="sunset"` will be provided to pointing to relevant documentation.
     
     Clients must monitor these messages and take corrective actions.
@@ -200,7 +135,7 @@ info:
 
     # Feature requests
     Feature requests are welcomed and can be submitted through: 
-  version: "0.1.0"
+  version: "1.0.0"
 
   contact:
     name: Maintenance API Team - GBS IT PLA POM
@@ -233,59 +168,269 @@ tags:
   - name: Modified endpoints
     description: |
       Endpoints which have been modified in the current version    
-  - name: Group 1
+  - name: Calendar
     description: |
-      Description for group 1
-  - name: Group 2.1
+      Calendar represent a date range to perform time writing for based on expecations in the work scehdule
+  - name: Time entries
     description: |
-      Description for group 2.1
-  - name: Group 2.2
+      Time entry represent hours registered on a specific day towards a cost object
+  - name: Cost objects
     description: |
-      Description for group 2.2
+      Cost object represent how the cost for each time entry is allocated
 
 x-tagGroups:
-  - name: Changes in 0.1.0
+  - name: Changes in 1.0.0
     tags:
       - New endpoints
       - Modified endpoints
-  - name: Group 1
+  - name: Calendar
     tags:
-      - Group 1
-  - name: Group 2
+      - Calendar
+  - name: Time entries
     tags:
-      - Group 2.1
-      - Group 2.2
+      - Time entries
+  - name: Cost objects
+    tags:
+      - Cost objects     
 
 paths:
-  /plants/{plant-id}/locations:
+  /calendar/{start-date}/{end-date}:
     get:
-      tags:
-      - Group 1
-      summary: Locations - Get
+      operationId: LookupCalendarByDateRange
+      summary: Lookup calendar for a date range
       description: |
         ### Overview
-        Get structured locations within the plant.
-        `locationId` is commonly used as metadata for tags and when creating `project-work-orders`.
-      operationId: GetLocations
+        TBD
+      tags:
+        - Calendar
+        - New endpoints
       parameters:
-      - name: plant-id
-        in: path
-        required: true
-        schema:
-          type: string
+        - in: path
+          name: start-date
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2021-11-01'
+        - in: path
+          name: end-date
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2021-11-01'            
+        - in: query
+          name: include-time-entries
+          description: Include all time entries in the calendar
+          required: false
+          schema:
+            type: boolean
+            default: true
       responses:
         '200':
-          description: Success
-          content:
-            'application/json':
+          content: 
+            application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Location'
-        '404':
-          $ref: '#/components/responses/NotFound'  
+                $ref: '#/components/schemas/Calendar'
+          description: Request successful
+        '400':
+          description: Bad request (for example if start-date is before end-date)
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'          
         default:
-            $ref: '#/components/responses/DefaultResponse' 
+          description: Unexpected error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'           
+
+                
+  /time-entries/{time-entry-id}:                
+    get:
+      operationId: LookupTimeEntry
+      summary: Lookup single time entry
+      description: |
+        ### Overview
+        Lookup a single time entry. 
+        Time entry represent hours registered on a specific day towards a cost object.
+        
+        ### Important information
+        Consider using the endpoint `/calendar/{start-date}/{end-date}` for retrieving all time entries in the date range.
+      tags:
+        - Time entries
+        - New endpoints
+      parameters:
+        - in: path
+          name: time-entry-id
+          required: true
+          schema: 
+            type: string
+            example: '154632395'
+      responses:
+        '200':
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntry'
+          description: Request successful and time entry updated
+        '404':
+          description: Time entry does not exist for logged in user
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundDetails'         
+        default:
+          description: Unexpected error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    patch:
+      operationId: UpdateTimeEntry
+      summary: Update single time entry
+      description: |
+        ## Overview
+        Update single time entry.
+        
+        Supports:
+        - Update comment
+        - Update hours
+        - Update date
+      tags:
+        - Time entries
+        - New endpoints
+      parameters:
+        - in: path
+          name: time-entry-id
+          required: true
+          schema: 
+            type: string
+            example: '154632395'
+      requestBody:
+        description: Time entry update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeEntryJsonPatch'
+            examples:
+              time-entries-update-hours:
+                $ref: '#/components/examples/time-entries-update-hours'  
+              time-entries-update-comment:
+                $ref: '#/components/examples/time-entries-update-comment'  
+              time-entries-update-date:
+                $ref: '#/components/examples/time-entries-update-date'                  
+              time-entries-update-all:
+                $ref: '#/components/examples/time-entries-update-all'             
+      responses:
+        '200':
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntry'
+          description: Request successful and time entry updated
+        '400':
+          description: Bad request - For example too many hours
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found - Time entry does not exist for logged in user
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundDetails'
+        '409':
+          description: Conflict - For example if the time entry is too far back in time and cannot be updated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'                 
+        default:
+          description: Unexpected error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    delete:
+      operationId: DeleteTimeEntry
+      summary: Delete single time entry
+      description: |
+        ## Overview
+        Delete single time entry.
+      tags:
+        - Time entries
+        - New endpoints
+      parameters:
+        - in: path
+          name: time-entry-id
+          required: true
+          schema: 
+            type: string
+            example: '154632395'
+      responses:
+        '204':
+          description: No content - Time entry deleted
+        '404':
+          description: Not found - Time entry does not exist for logged in user
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict - For example if the time entry is too far back in time and cannot be deleted
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'                 
+        default:
+          description: Unexpected error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'                
+
+  /cost-objects/{cost-object-id}:
+    get:
+      operationId: LookupCostObject
+      summary: Lookup single cost object
+      description: |
+        ### Overview
+        Lookup a single cost object. 
+        
+        The cost object is used when creating a new time entry.
+      tags:
+        - Cost objects
+        - New endpoints
+      parameters:
+        - in: path
+          name: cost-object-id
+          required: true
+          schema:
+            type: string
+            example: 'C.BAX.30.xxx'
+      responses:
+        '200':
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostObject'
+          description: Request successful
+        '404':
+          description: Not found - Cost object does not exist
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundDetails'        
+        default:
+          description: Unexpected error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails' 
 
 components:
   parameters:
@@ -311,20 +456,6 @@ components:
       name: ocp-apim-subscription-key
       in: header
 
-  responses:
-    NotFound:
-      description: The specified resource was not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NotFoundDetails'
-    DefaultResponse:
-      description: Response for other HTTP status codes
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'            
-      
   schemas:
     ProblemDetails:
           type: object
@@ -381,16 +512,184 @@ components:
               type: string
               description: Request id to be used for support
               example: '00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00'
-          additionalProperties: false  
-    Location:
+          additionalProperties: false
+          
+    Calendar:
+      type: object
+      properties:  
+        startDate:
+          type: string
+          format: date
+          description: Start date of the calendar. Key of calendar together with the endDate
+          example: "2021-11-04"
+        endDate:
+          type: string
+          format: date
+          description: End date of the calendar. Key of calendar together with the startDate
+          example: "2021-11-10"
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalendarDay'
+            
+    CalendarDay:
+      type: object
+      properties:  
+        date:
+          type: string
+          format: date
+          description: CalendarDay date
+          example: "2019-05-22"    
+        workSchedule:
+          type: number
+          format: double
+          description: Expected number of timewriting hours for this day
+          minimum: 0
+          maximum: 24
+          example: 8.0
+        sumHours: 
+          type: number
+          format: double
+          description: Actual number of hours for all timewriting on this day
+          minimum: 0
+          maximum: 24
+          example: 8.0
+        timeEntries:
+          type: array
+          items: 
+            $ref: '#/components/schemas/TimeEntry'
+    TimeEntry:
       type: object
       properties:
-        locationId:
+        timeEntryId: 
           type: string
-          description: Structured location within the plant where the tag is located
-          example: 'MG29'
-        location:
+          description: Unique id for time entry
+          example: '154632395'
+        date:
           type: string
-          example: 'MAIN DECK AFT'
-      additionalProperties: false
-      required: ["locationId", "location"]
+          format: date
+          description: Time entry date
+          example: '2021-11-04'
+        hours: 
+          type: number
+          format: double
+          description: Number of hours worked
+          minimum: 0
+          maximum: 24
+          example: 7.5
+        costObjectTypeId:
+          $ref: '#/components/schemas/CostObjectTypes'
+        costObjectId:
+          type: string
+          description: Cost object identifier
+          example: "C.BAX.30.xxx"
+        costSubObjectId:
+          type: string
+          description: Secondary cost object identifier. Not use for all cost object types.
+          example: ""
+        costObjectDescription:
+          type: string
+          description: Description of the cost object
+          example: "Project XYZ"
+        comment:
+          type: string
+          description: Comment for time entry          
+        
+        
+    TimeEntryJsonPatch:
+      type: array
+      items:
+        type: object
+        properties:
+          op: 
+            type: string
+            description: |
+              JSON Patch operation according to RFC6902.
+            enum: ['replace']
+            example: 'replace'
+          path: 
+            type: string
+            description: 'Path indicating the property to be impacted by the operation'
+            enum: ['/date', '/hours','/comment']
+          value: 
+            oneOf:
+              - type: string
+              - type: number
+            description: |
+              Value to be assigned to a resource property based on the operation and path.
+            example: '2021-11-11'        
+          
+    CostObjectTypes:
+      description: Type of cost object
+      type: string
+      enum:
+        - 'wbs'
+        - 'network'
+        
+    CostObject:
+      type: object
+      properties:
+        costObjectId: 
+          type: string
+          description: Cost object id
+          example: "9000000"
+        type:
+          $ref: '#/components/schemas/CostObjectTypes'
+        costObject:
+          type: string
+          description: Description of the cost object
+          example: "Project XYZ"
+        isOpenForTimeWriting:
+          type: boolean
+          description: Is the cost object open for time writing
+        subObjects: 
+          type: array
+          description: List of subobjects for cost object if exist
+          items: 
+            $ref: '#/components/schemas/CostSubObject'
+            
+    CostSubObject:
+      type: object
+      properties:
+        subCostObjectId: 
+          type: string
+          description: Cost subobject id
+          example: "0100"
+        subCostObject:
+          type: string
+          description: Description of the cost subobject
+          example: "Implement API"
+        isOpenForTimeWriting:
+          type: boolean
+          description: Is the cost subobject open for time writing        
+  examples:
+    time-entries-update-hours: 
+      summary: Update hours
+      value: 
+        - op: 'replace'
+          path: '/hours'
+          value: 7.5
+    time-entries-update-date: 
+      summary: Move time entry to other date
+      value: 
+        - op: 'replace'
+          path: '/date'
+          value: '2021-11-13'
+    time-entries-update-comment: 
+      summary: Update comment
+      value: 
+        - op: 'replace'
+          path: '/comment'
+          value: 'Project ZYX'
+    time-entries-update-all: 
+      summary: Update all
+      value: 
+        - op: 'replace'
+          path: '/date'
+          value: '2021-11-13'
+        - op: 'replace'
+          path: '/comment'
+          value: 'Project ZYX'
+        - op: 'replace'
+          path: '/hours'
+          value: 7.5          

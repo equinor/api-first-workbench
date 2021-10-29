@@ -1,0 +1,1426 @@
+components:
+  examples:
+    time-entries-update-all:
+      summary: Update all
+      value:
+        - op: replace
+          path: /date
+          value: '2021-11-13'
+        - op: replace
+          path: /comment
+          value: Project ZYX
+        - op: replace
+          path: /hours
+          value: 7.5
+    time-entries-update-comment:
+      summary: Update comment
+      value:
+        - op: replace
+          path: /comment
+          value: Project ZYX
+    time-entries-update-date:
+      summary: Move time entry to other date
+      value:
+        - op: replace
+          path: /date
+          value: '2021-11-13'
+    time-entries-update-hours:
+      summary: Update hours
+      value:
+        - op: replace
+          path: /hours
+          value: 7.5
+  parameters:
+    apiVersion:
+      description: api-version must be present in all request as part of the query string
+      in: query
+      name: api-version
+      required: true
+      schema:
+        enum:
+          - v1
+        type: string
+  schemas:
+    Calendar:
+      type: object
+      properties:
+        days:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                description: CalendarDay date
+                example: '2019-05-22'
+                format: date
+                type: string
+              sumHours:
+                description: Actual number of hours for all timewriting on this day
+                example: 8
+                format: double
+                maximum: 24
+                minimum: 0
+                type: number
+              timeEntries:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    comment:
+                      description: Comment for time entry
+                      type: string
+                    costObjectDescription:
+                      description: Description of the cost object
+                      example: Project XYZ
+                      type: string
+                    costObjectId:
+                      description: Cost object identifier
+                      example: C.BAX.30.xxx
+                      type: string
+                    costObjectTypeId:
+                      description: Type of cost object
+                      enum:
+                        - wbs
+                        - network
+                      type: string
+                    costSubObjectId:
+                      description: >-
+                        Secondary cost object identifier. Not use for all cost
+                        object types.
+                      example: ''
+                      type: string
+                    date:
+                      description: Time entry date
+                      example: '2021-11-04'
+                      format: date
+                      type: string
+                    hours:
+                      description: Number of hours worked
+                      example: 7.5
+                      format: double
+                      maximum: 24
+                      minimum: 0
+                      type: number
+                    timeEntryId:
+                      description: Unique id for time entry
+                      example: '154632395'
+                      type: string
+              workSchedule:
+                description: Expected number of timewriting hours for this day
+                example: 8
+                format: double
+                maximum: 24
+                minimum: 0
+                type: number
+        endDate:
+          description: >-
+            End date of the calendar. Key of calendar together with the
+            startDate
+          example: '2021-11-10'
+          format: date
+          type: string
+        startDate:
+          description: >-
+            Start date of the calendar. Key of calendar together with the
+            endDate
+          example: '2021-11-04'
+          format: date
+          type: string
+    CalendarDay:
+      type: object
+      properties:
+        date:
+          description: CalendarDay date
+          example: '2019-05-22'
+          format: date
+          type: string
+        sumHours:
+          description: Actual number of hours for all timewriting on this day
+          example: 8
+          format: double
+          maximum: 24
+          minimum: 0
+          type: number
+        timeEntries:
+          type: array
+          items:
+            type: object
+            properties:
+              comment:
+                description: Comment for time entry
+                type: string
+              costObjectDescription:
+                description: Description of the cost object
+                example: Project XYZ
+                type: string
+              costObjectId:
+                description: Cost object identifier
+                example: C.BAX.30.xxx
+                type: string
+              costObjectTypeId:
+                description: Type of cost object
+                enum:
+                  - wbs
+                  - network
+                type: string
+              costSubObjectId:
+                description: >-
+                  Secondary cost object identifier. Not use for all cost object
+                  types.
+                example: ''
+                type: string
+              date:
+                description: Time entry date
+                example: '2021-11-04'
+                format: date
+                type: string
+              hours:
+                description: Number of hours worked
+                example: 7.5
+                format: double
+                maximum: 24
+                minimum: 0
+                type: number
+              timeEntryId:
+                description: Unique id for time entry
+                example: '154632395'
+                type: string
+        workSchedule:
+          description: Expected number of timewriting hours for this day
+          example: 8
+          format: double
+          maximum: 24
+          minimum: 0
+          type: number
+    CostObject:
+      type: object
+      properties:
+        costObject:
+          description: Description of the cost object
+          example: Project XYZ
+          type: string
+        costObjectId:
+          description: Cost object id
+          example: '9000000'
+          type: string
+        isOpenForTimeWriting:
+          description: Is the cost object open for time writing
+          type: boolean
+        subObjects:
+          description: List of subobjects for cost object if exist
+          type: array
+          items:
+            type: object
+            properties:
+              isOpenForTimeWriting:
+                description: Is the cost subobject open for time writing
+                type: boolean
+              subCostObject:
+                description: Description of the cost subobject
+                example: Implement API
+                type: string
+              subCostObjectId:
+                description: Cost subobject id
+                example: '0100'
+                type: string
+        type:
+          description: Type of cost object
+          enum:
+            - wbs
+            - network
+          type: string
+    CostObjectTypes:
+      description: Type of cost object
+      enum:
+        - wbs
+        - network
+      type: string
+    CostSubObject:
+      type: object
+      properties:
+        isOpenForTimeWriting:
+          description: Is the cost subobject open for time writing
+          type: boolean
+        subCostObject:
+          description: Description of the cost subobject
+          example: Implement API
+          type: string
+        subCostObjectId:
+          description: Cost subobject id
+          example: '0100'
+          type: string
+    NotFoundDetails:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          description: HTTP status code
+          example: 404
+          format: int32
+          nullable: true
+          type: integer
+        title:
+          description: Description of error
+          example: Not Found
+          nullable: true
+          type: string
+        traceId:
+          description: Request id to be used for support
+          example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+          type: string
+        type:
+          description: Reference to HTTP status definition
+          example: https://tools.ietf.org/html/rfc7231#section-6.5.4
+          nullable: true
+          type: string
+    ProblemDetails:
+      type: object
+      additionalProperties: false
+      properties:
+        errors:
+          description: Detailed information about error
+          nullable: true
+          readOnly: true
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: false
+        status:
+          description: HTTP status code
+          example: 400
+          format: int32
+          nullable: true
+          type: integer
+        title:
+          description: Description of error
+          example: One or more validation errors occurred.
+          nullable: true
+          type: string
+        traceId:
+          description: Request id to be used for support
+          example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+          type: string
+        type:
+          description: Reference to HTTP status definition
+          example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+          nullable: true
+          type: string
+    TimeEntry:
+      type: object
+      properties:
+        comment:
+          description: Comment for time entry
+          type: string
+        costObjectDescription:
+          description: Description of the cost object
+          example: Project XYZ
+          type: string
+        costObjectId:
+          description: Cost object identifier
+          example: C.BAX.30.xxx
+          type: string
+        costObjectTypeId:
+          description: Type of cost object
+          enum:
+            - wbs
+            - network
+          type: string
+        costSubObjectId:
+          description: Secondary cost object identifier. Not use for all cost object types.
+          example: ''
+          type: string
+        date:
+          description: Time entry date
+          example: '2021-11-04'
+          format: date
+          type: string
+        hours:
+          description: Number of hours worked
+          example: 7.5
+          format: double
+          maximum: 24
+          minimum: 0
+          type: number
+        timeEntryId:
+          description: Unique id for time entry
+          example: '154632395'
+          type: string
+    TimeEntryJsonPatch:
+      type: array
+      items:
+        type: object
+        properties:
+          op:
+            description: |
+              JSON Patch operation according to RFC6902.
+            enum:
+              - replace
+            example: replace
+            type: string
+          path:
+            description: Path indicating the property to be impacted by the operation
+            enum:
+              - /date
+              - /hours
+              - /comment
+            type: string
+          value:
+            description: >
+              Value to be assigned to a resource property based on the operation
+              and path.
+            example: '2021-11-11'
+            oneOf:
+              - type: string
+              - type: number
+  securitySchemes:
+    apiKey:
+      description: Subscription key created from https://api.equinor.com
+      in: header
+      name: ocp-apim-subscription-key
+      type: apiKey
+    bearerAuth:
+      flows:
+        authorizationCode:
+          authorizationUrl: >-
+            https://login.windows.net/common/oauth2/authorize?resource=0e595101-1f08-4ce0-8684-148b2e2b8e18
+          tokenUrl: https://login.microsoftonline.com/common/oauth2/token
+      type: oauth2
+externalDocs:
+  description: API documentation
+  url: https://equinor.github.io/api-first-workbench
+info:
+  contact:
+    name: Maintenance API Team - GBS IT PLA POM
+    url: https://github.com/equinor/api-first-workbench
+  description: >
+    The Timewriting API is an open API covering the HR area.
+
+    It's an example API used to demonstrate the
+    [api-first-workbench](https://github.com/equinor/api-first-workbench) and
+    has not been implemented.
+
+
+    This document describes release v1.0.0. We recommend using documentation
+    published at https://equinor.github.io/api-first-workbench as it provides
+    the best developer experience.
+
+    Information on the next release v1.1.0 is available at [this
+    page](https://equinor.github.io/api-first-workbench/latest/)
+
+
+    # Introduction
+
+    The API is designed and built according to [Equinor's API
+    strategy](https://github.com/equinor/api-strategy).
+
+
+    The API is documented in OpenAPI 3.0 format and follows REST principles.
+
+
+    ## Terminology
+
+    The API will use common terminology used across the Oil&Gas industry.
+
+
+    ## API versioning
+
+    `api-version` must be present in all request as part of the query string.
+    **Requests without API version will be rejected with a HTTP 404 response
+    code**. The latest api-version is v1.
+
+
+    The `api-version` will stay stable over time as the API follows the
+    principles of [API
+    evolution](https://apisyouwonthate.com/blog/api-evolution-for-rest-http-apis)
+
+
+    ## Subscription key
+
+    Subscription key must be created from [Equinor's API
+    Portal](https://api.equinor.com/products/corporate) for the consumer
+    application  and each request must have the HTTP header
+    `Ocp-Apim-Subscription-Key` present with this value.
+
+
+    ## Authentication and authorization overview
+
+    The user executing the API requests will need to authenticate with OAuth 2.0
+    authorization code flow with Equinor Azure AD as the identity provider. 
+
+
+    # Modelling of resources
+
+    ## Resources
+
+    The resource will be named according to common terminology used across the
+    Oil&Gas industry (for example Norsok standard NS-EN 13306 and ISO 14224).
+
+
+    Example of resources are `/time-entries` and `/cost-objects`.
+
+
+    ## Resource keys
+
+    Resources keys will indicate the resource type as part of the name. 
+
+    Example: `timeEntryId` and `costObjectId`.
+
+
+    ## Dates
+
+    All date and time information are based on UTC (Universal Time Coordinated)
+    and formatted according to [RFC3339](https://www.ietf.org/rfc/rfc3339.txt)
+
+
+    This also applies to durations, such as 1 day or 2 hours, which are encoded
+    as `P0Y0M1DT0H0M0S` and `P0Y0M0DT2H0M0S`.
+
+
+    These values are easily compatible with time libraries such as [moment.js
+    library](https://momentjs.com/docs/).
+
+
+    # Modelling of endpoints
+
+    ## Operation - Lookup
+
+    Lookup operations return a single instance for the resource based on the
+    key.
+
+
+    The resource may have related data which may or may not be relevant for a
+    client. In order to indicate which related data to include, the lookup
+    operation may provide `include-...` query string boolean options.
+
+    Example: `include-time-entries`
+
+
+    ## Operation - Search/Filter
+
+    Clients need to retrieve a subset of all resources for an endpoint. Usually,
+    the criteria are non-trivial and in many case are not direct properties of
+    the resource. REST does not provide a well-defined pattern for these types
+    of requests. 
+
+
+    Our approach, is to provide predefined filters with parameters. Each filter
+    is documented in the OpenAPI specification.
+
+
+    ## Operation - Update
+
+    Update operations for resources will utilize a sub-set of the JSON Patch
+    proposed standard. JSON Patch is described in [RFC
+    6902](https://tools.ietf.org/html/rfc6902) with a user-friendly version at
+    [http://jsonpatch.com/](http://jsonpatch.com/). 
+
+
+    Our goals with using JSON Patch is to focus on the intent of the update and
+    avoid common pitfalls for the client. The common pitfalls we avoid with JSON
+    Patch are: 
+
+    1. Clients inadvertently resetting properties of a resource to an empty
+    value. This due to the client mistakenly sending all properties of a
+    resource in a HTTP PATCH request with some of them having an initial value.
+
+    1. Clients inadvertently overwriting changes made by other users directly in
+    the back-end system. This due to client mistakenly have provided properties
+    which have not been changed in a HTTP PATCH request.
+
+
+    Using JSON Patch is straightforward. 
+
+    - Set the content-type to `application/json-patch+json`. 
+
+    - In the body, send an array of JSON Patch operations. Typically, one
+    element pr property to be update for the resource
+
+
+    As part of the OpenAPI documentation, we will provide concrete examples for
+    all update operation. In addition, the schema definiton for the request body
+    defines which resource properties can be updated.
+
+
+    Example of JSON Patch request body which replaces the value of the
+    properties title and text:
+
+    ```
+
+    [
+      {
+        "op": "replace",
+        "path": "/comment ",
+        "value": "New comment"
+      },
+      {
+        "op": "replace",
+        "path": "/hours",
+        "value": 4
+      }
+    ]
+
+    ```
+
+
+    ## HTTP Response codes
+
+    HTTP response codes will follow established best practice for REST services
+    and will be documented in the OpenAPI specification. 
+
+
+    Below is a list of status codes used in the API which the client should
+    handle. 
+
+    Common: 
+
+    * 400 Bad Request - The request is invalid. For example missing parameters
+    in the query string
+
+    * 401 Unauthorized - The request did not include an authentication token or
+    the authentication token was expired or invalid
+
+    * 403 Forbidden - User does not have sufficient permissions
+
+    * 405 Method not allowed - HTTP verb not supported for requested resource
+
+    * 500 Internal Server Error - Sorry, an unexpected error occured on our
+    side. Let's us know and we'll get around to fix it
+
+    * 503 Service unavailable - API or a service it depends on is currently not
+    available. 
+
+
+    Read - HTTP GET:
+
+    * 200 OK - The request completed successfully
+
+    * 404 Not Found - The resource does not exist or an non-existing endpoint
+    has been called
+
+
+    Create - HTTP POST: 
+
+    * 201 Created - Create of resource was successful and resource is returned
+    in body
+
+    * 400 Bad Request - The resource provided in the body is not according to
+    specification
+
+    * 409 Conflict - The creation of this resource is in conflict with an
+    already existing resources
+
+
+    Create - HTTP PUT:
+
+    * 204 No Content - Request successful but no resource returned in body
+
+
+    Update - HTTP PATCH: 
+
+    * 200 OK - Update of resource was successful and resource is returned in
+    body
+
+    * 400 Bad Request - The resource properties to update is not according to
+    specification
+
+    * 409 Conflict - The update of this resource is in conflict with an already
+    existing resources
+
+
+    Delete - HTTP DELETE: 
+
+    * 204 No Content - Request successful but no resource returned in body
+
+    * 409 Conflict - The deletion of this resource is not possible
+
+
+    # Deprecation
+
+    ## Deprecation policy
+
+    The API will use the principles of [API
+    evolution](https://apisyouwonthate.com/blog/api-evolution-for-rest-http-apis)
+    instead of introducing a new api-version on every breaking change.
+
+
+    In order to achieve this, endpoints, query parameters and resource
+    properties can become deprecated and will be marked so in the OpenAPI
+    specification.
+
+
+    In general, depcrated properties will be removed after 3 months.
+
+    If a client uses a deprecated endpoint or query parameter, the API will in
+    the response provide a Sunset HTTP header
+
+    `Sunset: Sat, 15 May 2021 12:59:59 GMT` representing the removal date for
+    the deprecated feature as specified in
+    [RFC8594](https://tools.ietf.org/html/rfc8594). In addition, a HTTP header
+    `Link:
+    <https://equinor.github.io/maintenance-api-docs/#section/Deprecation>;
+    rel="sunset"` will be provided to pointing to relevant documentation.
+
+
+    Clients must monitor these messages and take corrective actions.
+
+
+    ## Endpoints with deprecation
+
+    None
+
+
+    # Feature requests
+
+    Feature requests are welcomed and can be submitted through: 
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/
+  title: Timewriting API
+  version: 1.0.0
+  x-logo:
+    altText: Maintenance API logo
+    url: https://equinor.github.io/api-first-workbench/img/logo.png
+openapi: 3.0.1
+paths:
+  /api-first-workbench/calendar/{start-date}/{end-date}:
+    get:
+      description: |
+        ### Overview
+        TBD
+      operationId: LookupCalendarByDateRange
+      parameters:
+        - in: path
+          name: start-date
+          required: true
+          schema:
+            example: '2021-11-01'
+            format: date
+            type: string
+        - in: path
+          name: end-date
+          required: true
+          schema:
+            example: '2021-11-01'
+            format: date
+            type: string
+        - description: Include all time entries in the calendar
+          in: query
+          name: include-time-entries
+          required: false
+          schema:
+            default: true
+            type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  days:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          description: CalendarDay date
+                          example: '2019-05-22'
+                          format: date
+                          type: string
+                        sumHours:
+                          description: >-
+                            Actual number of hours for all timewriting on this
+                            day
+                          example: 8
+                          format: double
+                          maximum: 24
+                          minimum: 0
+                          type: number
+                        timeEntries:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              comment:
+                                description: Comment for time entry
+                                type: string
+                              costObjectDescription:
+                                description: Description of the cost object
+                                example: Project XYZ
+                                type: string
+                              costObjectId:
+                                description: Cost object identifier
+                                example: C.BAX.30.xxx
+                                type: string
+                              costObjectTypeId:
+                                description: Type of cost object
+                                enum:
+                                  - wbs
+                                  - network
+                                type: string
+                              costSubObjectId:
+                                description: >-
+                                  Secondary cost object identifier. Not use for
+                                  all cost object types.
+                                example: ''
+                                type: string
+                              date:
+                                description: Time entry date
+                                example: '2021-11-04'
+                                format: date
+                                type: string
+                              hours:
+                                description: Number of hours worked
+                                example: 7.5
+                                format: double
+                                maximum: 24
+                                minimum: 0
+                                type: number
+                              timeEntryId:
+                                description: Unique id for time entry
+                                example: '154632395'
+                                type: string
+                        workSchedule:
+                          description: Expected number of timewriting hours for this day
+                          example: 8
+                          format: double
+                          maximum: 24
+                          minimum: 0
+                          type: number
+                  endDate:
+                    description: >-
+                      End date of the calendar. Key of calendar together with
+                      the startDate
+                    example: '2021-11-10'
+                    format: date
+                    type: string
+                  startDate:
+                    description: >-
+                      Start date of the calendar. Key of calendar together with
+                      the endDate
+                    example: '2021-11-04'
+                    format: date
+                    type: string
+          description: Request successful
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  errors:
+                    description: Detailed information about error
+                    nullable: true
+                    readOnly: true
+                    type: object
+                    additionalProperties:
+                      type: object
+                      additionalProperties: false
+                  status:
+                    description: HTTP status code
+                    example: 400
+                    format: int32
+                    nullable: true
+                    type: integer
+                  title:
+                    description: Description of error
+                    example: One or more validation errors occurred.
+                    nullable: true
+                    type: string
+                  traceId:
+                    description: Request id to be used for support
+                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+                    type: string
+                  type:
+                    description: Reference to HTTP status definition
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    nullable: true
+                    type: string
+          description: Bad request (for example if start-date is before end-date)
+        default:
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  errors:
+                    description: Detailed information about error
+                    nullable: true
+                    readOnly: true
+                    type: object
+                    additionalProperties:
+                      type: object
+                      additionalProperties: false
+                  status:
+                    description: HTTP status code
+                    example: 400
+                    format: int32
+                    nullable: true
+                    type: integer
+                  title:
+                    description: Description of error
+                    example: One or more validation errors occurred.
+                    nullable: true
+                    type: string
+                  traceId:
+                    description: Request id to be used for support
+                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+                    type: string
+                  type:
+                    description: Reference to HTTP status definition
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    nullable: true
+                    type: string
+          description: Unexpected error
+      summary: Lookup calendar for a date range
+      tags:
+        - Calendar
+        - New endpoints
+  /api-first-workbench/cost-objects/{cost-object-id}:
+    get:
+      description: |
+        ### Overview
+        Lookup a single cost object. 
+
+        The cost object is used when creating a new time entry.
+      operationId: LookupCostObject
+      parameters:
+        - in: path
+          name: cost-object-id
+          required: true
+          schema:
+            example: C.BAX.30.xxx
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  costObject:
+                    description: Description of the cost object
+                    example: Project XYZ
+                    type: string
+                  costObjectId:
+                    description: Cost object id
+                    example: '9000000'
+                    type: string
+                  isOpenForTimeWriting:
+                    description: Is the cost object open for time writing
+                    type: boolean
+                  subObjects:
+                    description: List of subobjects for cost object if exist
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        isOpenForTimeWriting:
+                          description: Is the cost subobject open for time writing
+                          type: boolean
+                        subCostObject:
+                          description: Description of the cost subobject
+                          example: Implement API
+                          type: string
+                        subCostObjectId:
+                          description: Cost subobject id
+                          example: '0100'
+                          type: string
+                  type:
+                    description: Type of cost object
+                    enum:
+                      - wbs
+                      - network
+                    type: string
+          description: Request successful
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  status:
+                    description: HTTP status code
+                    example: 404
+                    format: int32
+                    nullable: true
+                    type: integer
+                  title:
+                    description: Description of error
+                    example: Not Found
+                    nullable: true
+                    type: string
+                  traceId:
+                    description: Request id to be used for support
+                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+                    type: string
+                  type:
+                    description: Reference to HTTP status definition
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.4
+                    nullable: true
+                    type: string
+          description: Not found - Cost object does not exist
+        default:
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  errors:
+                    description: Detailed information about error
+                    nullable: true
+                    readOnly: true
+                    type: object
+                    additionalProperties:
+                      type: object
+                      additionalProperties: false
+                  status:
+                    description: HTTP status code
+                    example: 400
+                    format: int32
+                    nullable: true
+                    type: integer
+                  title:
+                    description: Description of error
+                    example: One or more validation errors occurred.
+                    nullable: true
+                    type: string
+                  traceId:
+                    description: Request id to be used for support
+                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+                    type: string
+                  type:
+                    description: Reference to HTTP status definition
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    nullable: true
+                    type: string
+          description: Unexpected error
+      summary: Lookup single cost object
+      tags:
+        - Cost objects
+        - New endpoints
+  /api-first-workbench/time-entries/{time-entry-id}:
+    delete:
+      description: |
+        ## Overview
+        Delete single time entry.
+      operationId: DeleteTimeEntry
+      parameters:
+        - in: path
+          name: time-entry-id
+          required: true
+          schema:
+            example: '154632395'
+            type: string
+      responses:
+        '204':
+          description: No content - Time entry deleted
+        '404':
+          content:
+            application/json:
+              schema: &ref_0
+                additionalProperties: false
+                properties:
+                  errors:
+                    additionalProperties:
+                      additionalProperties: false
+                      type: object
+                    description: Detailed information about error
+                    nullable: true
+                    readOnly: true
+                    type: object
+                  status:
+                    description: HTTP status code
+                    example: 400
+                    format: int32
+                    nullable: true
+                    type: integer
+                  title:
+                    description: Description of error
+                    example: One or more validation errors occurred.
+                    nullable: true
+                    type: string
+                  traceId:
+                    description: Request id to be used for support
+                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+                    type: string
+                  type:
+                    description: Reference to HTTP status definition
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    nullable: true
+                    type: string
+                type: object
+          description: Not found - Time entry does not exist for logged in user
+        '409':
+          content:
+            application/json:
+              schema: *ref_0
+          description: >-
+            Conflict - For example if the time entry is too far back in time and
+            cannot be deleted
+        default:
+          content:
+            application/json:
+              schema: *ref_0
+          description: Unexpected error
+      summary: Delete single time entry
+      tags:
+        - Time entries
+        - New endpoints
+    get:
+      description: >
+        ### Overview
+
+        Lookup a single time entry. 
+
+        Time entry represent hours registered on a specific day towards a cost
+        object.
+
+
+        ### Important information
+
+        Consider using the endpoint `/calendar/{start-date}/{end-date}` for
+        retrieving all time entries in the date range.
+      operationId: LookupTimeEntry
+      parameters:
+        - in: path
+          name: time-entry-id
+          required: true
+          schema:
+            example: '154632395'
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  comment:
+                    description: Comment for time entry
+                    type: string
+                  costObjectDescription:
+                    description: Description of the cost object
+                    example: Project XYZ
+                    type: string
+                  costObjectId:
+                    description: Cost object identifier
+                    example: C.BAX.30.xxx
+                    type: string
+                  costObjectTypeId:
+                    description: Type of cost object
+                    enum:
+                      - wbs
+                      - network
+                    type: string
+                  costSubObjectId:
+                    description: >-
+                      Secondary cost object identifier. Not use for all cost
+                      object types.
+                    example: ''
+                    type: string
+                  date:
+                    description: Time entry date
+                    example: '2021-11-04'
+                    format: date
+                    type: string
+                  hours:
+                    description: Number of hours worked
+                    example: 7.5
+                    format: double
+                    maximum: 24
+                    minimum: 0
+                    type: number
+                  timeEntryId:
+                    description: Unique id for time entry
+                    example: '154632395'
+                    type: string
+          description: Request successful and time entry updated
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  status:
+                    description: HTTP status code
+                    example: 404
+                    format: int32
+                    nullable: true
+                    type: integer
+                  title:
+                    description: Description of error
+                    example: Not Found
+                    nullable: true
+                    type: string
+                  traceId:
+                    description: Request id to be used for support
+                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+                    type: string
+                  type:
+                    description: Reference to HTTP status definition
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.4
+                    nullable: true
+                    type: string
+          description: Time entry does not exist for logged in user
+        default:
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  errors:
+                    description: Detailed information about error
+                    nullable: true
+                    readOnly: true
+                    type: object
+                    additionalProperties:
+                      type: object
+                      additionalProperties: false
+                  status:
+                    description: HTTP status code
+                    example: 400
+                    format: int32
+                    nullable: true
+                    type: integer
+                  title:
+                    description: Description of error
+                    example: One or more validation errors occurred.
+                    nullable: true
+                    type: string
+                  traceId:
+                    description: Request id to be used for support
+                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+                    type: string
+                  type:
+                    description: Reference to HTTP status definition
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    nullable: true
+                    type: string
+          description: Unexpected error
+      summary: Lookup single time entry
+      tags:
+        - Time entries
+        - New endpoints
+    patch:
+      description: |
+        ## Overview
+        Update single time entry.
+
+        Supports:
+        - Update comment
+        - Update hours
+        - Update date
+      operationId: UpdateTimeEntry
+      parameters:
+        - in: path
+          name: time-entry-id
+          required: true
+          schema:
+            example: '154632395'
+            type: string
+      requestBody:
+        content:
+          application/json:
+            examples:
+              time-entries-update-all:
+                summary: Update all
+                value:
+                  - op: replace
+                    path: /date
+                    value: '2021-11-13'
+                  - op: replace
+                    path: /comment
+                    value: Project ZYX
+                  - op: replace
+                    path: /hours
+                    value: 7.5
+              time-entries-update-comment:
+                summary: Update comment
+                value:
+                  - op: replace
+                    path: /comment
+                    value: Project ZYX
+              time-entries-update-date:
+                summary: Move time entry to other date
+                value:
+                  - op: replace
+                    path: /date
+                    value: '2021-11-13'
+              time-entries-update-hours:
+                summary: Update hours
+                value:
+                  - op: replace
+                    path: /hours
+                    value: 7.5
+            schema:
+              items:
+                properties:
+                  op:
+                    description: |
+                      JSON Patch operation according to RFC6902.
+                    enum:
+                      - replace
+                    example: replace
+                    type: string
+                  path:
+                    description: >-
+                      Path indicating the property to be impacted by the
+                      operation
+                    enum:
+                      - /date
+                      - /hours
+                      - /comment
+                    type: string
+                  value:
+                    description: >
+                      Value to be assigned to a resource property based on the
+                      operation and path.
+                    example: '2021-11-11'
+                    oneOf:
+                      - type: string
+                      - type: number
+                type: object
+              type: array
+        description: Time entry update
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  comment:
+                    description: Comment for time entry
+                    type: string
+                  costObjectDescription:
+                    description: Description of the cost object
+                    example: Project XYZ
+                    type: string
+                  costObjectId:
+                    description: Cost object identifier
+                    example: C.BAX.30.xxx
+                    type: string
+                  costObjectTypeId:
+                    description: Type of cost object
+                    enum:
+                      - wbs
+                      - network
+                    type: string
+                  costSubObjectId:
+                    description: >-
+                      Secondary cost object identifier. Not use for all cost
+                      object types.
+                    example: ''
+                    type: string
+                  date:
+                    description: Time entry date
+                    example: '2021-11-04'
+                    format: date
+                    type: string
+                  hours:
+                    description: Number of hours worked
+                    example: 7.5
+                    format: double
+                    maximum: 24
+                    minimum: 0
+                    type: number
+                  timeEntryId:
+                    description: Unique id for time entry
+                    example: '154632395'
+                    type: string
+                type: object
+          description: Request successful and time entry updated
+        '400':
+          content:
+            application/json:
+              schema: *ref_0
+          description: Bad request - For example too many hours
+        '404':
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                properties:
+                  status:
+                    description: HTTP status code
+                    example: 404
+                    format: int32
+                    nullable: true
+                    type: integer
+                  title:
+                    description: Description of error
+                    example: Not Found
+                    nullable: true
+                    type: string
+                  traceId:
+                    description: Request id to be used for support
+                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+                    type: string
+                  type:
+                    description: Reference to HTTP status definition
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.4
+                    nullable: true
+                    type: string
+                type: object
+          description: Not found - Time entry does not exist for logged in user
+        '409':
+          content:
+            application/json:
+              schema: *ref_0
+          description: >-
+            Conflict - For example if the time entry is too far back in time and
+            cannot be updated
+        default:
+          content:
+            application/json:
+              schema: *ref_0
+          description: Unexpected error
+      summary: Update single time entry
+      tags:
+        - Time entries
+        - New endpoints
+security:
+  - bearerAuth: []
+  - apiKey: []
+servers:
+  - description: Development environment
+    url: https://api-dev.gateway.equinor.com/api-first-workbench
+tags:
+  - description: |
+      Endpoints which are introduces in the current version
+    name: New endpoints
+  - description: |
+      Endpoints which have been modified in the current version    
+    name: Modified endpoints
+  - description: >
+      Calendar represent a date range to perform time writing for based on
+      expecations in the work scehdule
+    name: Calendar
+  - description: >
+      Time entry represent hours registered on a specific day towards a cost
+      object
+    name: Time entries
+  - description: |
+      Cost object represent how the cost for each time entry is allocated
+    name: Cost objects
+x-tagGroups:
+  - name: Changes in 1.0.0
+    tags:
+      - New endpoints
+      - Modified endpoints
+  - name: Calendar
+    tags:
+      - Calendar
+  - name: Time entries
+    tags:
+      - Time entries
+  - name: Cost objects
+    tags:
+      - Cost objects

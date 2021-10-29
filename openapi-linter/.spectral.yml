@@ -1,5 +1,12 @@
 extends: spectral:oas
 rules:
-  oas3-valid-oas-content-example: warn
-  no-$ref-siblings: warn
   operation-tag-defined: error
+  operation-description: error  
+  oas3-valid-oas-content-example: error
+  patch-post-must-have-examples:
+    description: Patch and Post endpoints must have examples
+    given: $.paths[*][?( @property === 'patch' || @property === 'post')]
+    severity: error
+    then:
+      field: requestBody.content.application/json.examples
+      function: truthy
