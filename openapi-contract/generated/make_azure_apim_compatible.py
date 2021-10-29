@@ -2,12 +2,12 @@ import sys
 import yaml
 
 
-def scrub_examples(yaml_path):
+def make_azure_apim_compatible(yaml_path):
     with open(yaml_path, 'r') as stream:
         try:
             loaded_yaml = yaml.safe_load(stream)
             pop_examples(loaded_yaml, 0)
-            output = yaml_path.split('.y')[0] + '-scrubbed-example.yaml'
+            output = yaml_path.split('.y')[0] + '-azure-apim-compatible.yaml'
             path = output.split('openapi-contract/')
             final_output = path[0] + 'openapi-contract/generated/' + path[1]
             stream = open(final_output, 'w')
@@ -30,5 +30,5 @@ def pop_examples(dictionary, key_index):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        raise SystemError('You need to pass one argument with input to OAS yml file')
-    scrub_examples(sys.argv[1])
+        raise SystemError('You need to pass one argument as input (OpenAPI contract yaml file reference)')
+    make_azure_apim_compatible(sys.argv[1])

@@ -1,6 +1,6 @@
 name: OpenAPI prepare for APIM
 # API Management does not support examples in the OpenAPI contract (ref https://docs.microsoft.com/en-us/azure/api-management/api-management-api-import-restrictions)
-# Therefore, we use a python script to remove the examples and save the new file as openapi-contract/api-contract-scrubbed-example.yaml
+# Therefore, we use a python script to remove the examples and save the new file as openapi-contract/api-contract-azure-apim-compatible.yaml
 
 on:
   #Triggered manually
@@ -40,9 +40,9 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: run main.py
         run: |
-          python openapi-contract/generated/scrub_examples.py openapi-contract/api-contract.yaml
+          python openapi-contract/generated/make_azure_apim_compatible.py openapi-contract/api-contract.yaml
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: 'auto: committed OAS-file without examples'
+          commit_message: 'auto: committed OAS-file compatible with Azure APIM'
           commit_user_name: Github actions bot
           commit_user_email: dapa@equinor.com
