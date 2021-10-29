@@ -244,70 +244,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'           
-  /calendar/{start-date}/{end-date}/time-entries:
-    put:
-      operationId: PutTimeEntriesForCalendar
-      summary: Perform time writing for calendar (overwrites existing time entries)
-      description: |
-        ### Overview
-        Perform time writing by supplying all time entries for a given calendar period. 
-        
-        It's also possible to change individual time entries via endpoints `POST /time-entries`,`PATCH /time-entries/{time-entry-id}` and `DELETE /time-entries/{time-entry-id}`.
-        
-        ### Important information
-        This operation overwrites all existing time writing in the given calendar period.  
-        
-        If there are errors for one or more of the time entries, none of them will be updated.
-      tags:
-        - Calendar
-        - New endpoints
-      parameters:
-        - in: path
-          name: start-date
-          required: true
-          schema:
-            type: string
-            format: date
-            example: '2021-11-01'
-        - in: path
-          name: end-date
-          required: true
-          schema:
-            type: string
-            format: date
-            example: '2021-11-01'
-      requestBody:
-        description: Time entries
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:  
-                $ref: '#/components/schemas/TimeEntryCreate'
-            #examples:
-            #  calendar-time-entries-put:
-            #    $ref: '#/components/examples/calendar-time-entries-put'        
-      responses:
-        '204': 
-          description: Successful - No content. Lookup result using `GET /calendar/{start-date}/{end-date}`
-        '400':
-          description: Bad request (for example invalid costObjectId)
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'          
-        default:
-          description: Unexpected error
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails' 
+
                 
   /time-entries/{time-entry-id}:                
     get:
       operationId: LookupTimeEntry
       summary: Lookup single time entry
+      description: |
+        ### Overview
+        Lookup a single time entry. 
+        Time entry represent hours registered on a specific day towards a cost object.
+        
+        ### Important information
+        Consider using the endpoint `/calendar/{start-date}/{end-date}` for retrieving all time entries in the date range.
       tags:
         - Time entries
         - New endpoints
@@ -330,7 +279,7 @@ paths:
           content: 
             application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetails'         
+                $ref: '#/components/schemas/NotFoundDetails'         
         default:
           description: Unexpected error
           content: 
@@ -365,9 +314,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TimeEntryJsonPatch'
-            #examples:
-            #  time-entries-update-all:
-            #    $ref: '#/components/examples/time-entries-update-all'             
+            examples:
+              time-entries-update-hours:
+                $ref: '#/components/examples/time-entries-update-hours'  
+              time-entries-update-comment:
+                $ref: '#/components/examples/time-entries-update-comment'  
+              time-entries-update-date:
+                $ref: '#/components/examples/time-entries-update-date'                  
+              time-entries-update-all:
+                $ref: '#/components/examples/time-entries-update-all'             
       responses:
         '200':
           content: 
@@ -386,7 +341,7 @@ paths:
           content: 
             application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/NotFoundDetails'
         '409':
           description: Conflict - For example if the time entry is too far back in time and cannot be updated
           content: 
@@ -437,52 +392,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'                
 
-  /time-entries:
-    post:
-      operationId: CreateTimeEntry
-      summary: Create single time entry
-      tags:
-        - Time entries
-        - New endpoints
-      description: |
-        ## Overview
-        Create single time entry.
-      requestBody:
-        description: Time entry update
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TimeEntryCreate'
-            #examples:
-            #  time-entries-create-all:
-            #    $ref: '#/components/examples/time-entries-create-all'
-      responses:
-        '201':
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TimeEntry'
-          description: Created
-        '400':
-          description: Bad request - For example too many hours
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        '409':
-          description: Conflict - For example if the date is too far back in time and cannot be used
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-        default:
-          description: Unexpected error
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-
   /cost-objects/{cost-object-id}:
     get:
       operationId: LookupCostObject
@@ -514,7 +423,7 @@ paths:
           content: 
             application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetails'        
+                $ref: '#/components/schemas/NotFoundDetails'        
         default:
           description: Unexpected error
           content: 
@@ -546,20 +455,6 @@ components:
       name: ocp-apim-subscription-key
       in: header
 
-  responses:
-    NotFound:
-      description: The specified resource was not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NotFoundDetails'
-    DefaultResponse:
-      description: Response for other HTTP status codes
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'            
-      
   schemas:
     ProblemDetails:
           type: object
@@ -698,42 +593,7 @@ components:
         comment:
           type: string
           description: Comment for time entry          
-          
-    TimeEntryCreate:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-          description: Time entry date
-          example: '2021-11-04'
-        hours: 
-          type: number
-          format: double
-          description: Number of hours worked
-          minimum: 0
-          maximum: 24
-          example: 8.0
-        costObjectTypeId:
-          $ref: '#/components/schemas/CostObjectTypes'
-        costObjectId:
-          type: string
-          description: Cost object identifier
-          example: 'C.BAX.30.xxx'
-        costSubObjectId:
-          type: string
-          description: Secondary cost object identifier. Not use for all cost object types.
-          example: '0100'
-        comment:
-          type: string
-          description: Comment for time entry
-          example: 'Analysis of task xyz'
-          maxLength: 40          
-      required:
-        - date
-        - hours
-        - costObjectTypeId
-        - costObjectId
+        
         
     TimeEntryJsonPatch:
       type: array
@@ -751,7 +611,9 @@ components:
             description: 'Path indicating the property to be impacted by the operation'
             enum: ['/date', '/hours','/comment']
           value: 
-            type: string
+            oneOf:
+              - type: string
+              - type: number
             description: |
               Value to be assigned to a resource property based on the operation and path.
             example: '2021-11-11'        
@@ -800,9 +662,33 @@ components:
           type: boolean
           description: Is the cost subobject open for time writing        
   examples:
-    wo-update-text: 
-      summary: Append text to work order
+    time-entries-update-hours: 
+      summary: Update hours
       value: 
-        - op: 'append'
-          path: '/text'
-          value: "Text to append\nMulti-line"      
+        - op: 'replace'
+          path: '/hours'
+          value: 7.5
+    time-entries-update-date: 
+      summary: Move time entry to other date
+      value: 
+        - op: 'replace'
+          path: '/date'
+          value: '2021-11-13'
+    time-entries-update-comment: 
+      summary: Update comment
+      value: 
+        - op: 'replace'
+          path: '/comment'
+          value: 'Project ZYX'
+    time-entries-update-all: 
+      summary: Update all
+      value: 
+        - op: 'replace'
+          path: '/date'
+          value: '2021-11-13'
+        - op: 'replace'
+          path: '/comment'
+          value: 'Project ZYX'
+        - op: 'replace'
+          path: '/hours'
+          value: 7.5          
