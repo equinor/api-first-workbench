@@ -52,3 +52,13 @@ With the API first approach, we can achieve:
 - Decoupling of API design and development. The API definition becomes a contract that teams can work on without having to wait for the implementation to be completed. And the implementation can be changed / replaced without impacting the clients.
 - Specifying APIs with a standard specification language facilitates usage of tools for generating documentation, mock code, automatic quality checks, API Management tools, etc.
 
+## Process
+
+### Mature
+![Mature](https://user-images.githubusercontent.com/1133607/139441972-e4875b72-756c-45a0-8601-8d2f655ee642.png)
+
+### Implement with Test Driven Development
+![Implement](https://user-images.githubusercontent.com/1133607/139441997-a39f74ff-016f-43cd-88ec-46319ae64021.png)
+
+### Release to production
+![Release](https://user-images.githubusercontent.com/1133607/139442053-67eca91f-1384-4eb8-9b28-d9a4d899aaef.png)
