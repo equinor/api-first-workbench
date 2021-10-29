@@ -1,13 +1,35 @@
 components:
   examples:
-    wo-update-text:
-      summary: Append text to work order
+    time-entries-update-all:
+      summary: Update all
       value:
-      - op: append
-        path: /text
-        value: 'Text to append
-
-          Multi-line'
+      - op: replace
+        path: /date
+        value: '2021-11-13'
+      - op: replace
+        path: /comment
+        value: Project ZYX
+      - op: replace
+        path: /hours
+        value: 7.5
+    time-entries-update-comment:
+      summary: Update comment
+      value:
+      - op: replace
+        path: /comment
+        value: Project ZYX
+    time-entries-update-date:
+      summary: Move time entry to other date
+      value:
+      - op: replace
+        path: /date
+        value: '2021-11-13'
+    time-entries-update-hours:
+      summary: Update hours
+      value:
+      - op: replace
+        path: /hours
+        value: 7.5
   parameters:
     apiVersion:
       description: api-version must be present in all request as part of the query
@@ -19,19 +41,6 @@ components:
         enum:
         - v1
         type: string
-  responses:
-    DefaultResponse:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-      description: Response for other HTTP status codes
-    NotFound:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NotFoundDetails'
-      description: The specified resource was not found
   schemas:
     Calendar:
       properties:
@@ -212,42 +221,6 @@ components:
           example: '154632395'
           type: string
       type: object
-    TimeEntryCreate:
-      properties:
-        comment:
-          description: Comment for time entry
-          example: Analysis of task xyz
-          maxLength: 40
-          type: string
-        costObjectId:
-          description: Cost object identifier
-          example: C.BAX.30.xxx
-          type: string
-        costObjectTypeId:
-          $ref: '#/components/schemas/CostObjectTypes'
-        costSubObjectId:
-          description: Secondary cost object identifier. Not use for all cost object
-            types.
-          example: '0100'
-          type: string
-        date:
-          description: Time entry date
-          example: '2021-11-04'
-          format: date
-          type: string
-        hours:
-          description: Number of hours worked
-          example: 8.0
-          format: double
-          maximum: 24
-          minimum: 0
-          type: number
-      required:
-      - date
-      - hours
-      - costObjectTypeId
-      - costObjectId
-      type: object
     TimeEntryJsonPatch:
       items:
         properties:
@@ -272,7 +245,9 @@ components:
 
               '
             example: '2021-11-11'
-            type: string
+            oneOf:
+            - type: string
+            - type: number
         type: object
       type: array
   securitySchemes:
@@ -450,59 +425,6 @@ paths:
       tags:
       - Calendar
       - New endpoints
-  /api-first-workbench/calendar/{start-date}/{end-date}/time-entries:
-    put:
-      description: "### Overview\nPerform time writing by supplying all time entries\
-        \ for a given calendar period. \n\nIt's also possible to change individual\
-        \ time entries via endpoints `POST /time-entries`,`PATCH /time-entries/{time-entry-id}`\
-        \ and `DELETE /time-entries/{time-entry-id}`.\n\n### Important information\n\
-        This operation overwrites all existing time writing in the given calendar\
-        \ period.  \n\nIf there are errors for one or more of the time entries, none\
-        \ of them will be updated.\n"
-      operationId: PutTimeEntriesForCalendar
-      parameters:
-      - in: path
-        name: start-date
-        required: true
-        schema:
-          example: '2021-11-01'
-          format: date
-          type: string
-      - in: path
-        name: end-date
-        required: true
-        schema:
-          example: '2021-11-01'
-          format: date
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              items:
-                $ref: '#/components/schemas/TimeEntryCreate'
-              type: array
-        description: Time entries
-        required: true
-      responses:
-        '204':
-          description: Successful - No content. Lookup result using `GET /calendar/{start-date}/{end-date}`
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-          description: Bad request (for example invalid costObjectId)
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-          description: Unexpected error
-      summary: Perform time writing for calendar (overwrites existing time entries)
-      tags:
-      - Calendar
-      - New endpoints
   /api-first-workbench/cost-objects/{cost-object-id}:
     get:
       description: "### Overview\nLookup a single cost object. \n\nThe cost object\
@@ -526,7 +448,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/NotFoundDetails'
           description: Not found - Cost object does not exist
         default:
           content:
@@ -537,51 +459,6 @@ paths:
       summary: Lookup single cost object
       tags:
       - Cost objects
-      - New endpoints
-  /api-first-workbench/time-entries:
-    post:
-      description: '## Overview
-
-        Create single time entry.
-
-        '
-      operationId: CreateTimeEntry
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TimeEntryCreate'
-        description: Time entry update
-        required: true
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TimeEntry'
-          description: Created
-        '400':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-          description: Bad request - For example too many hours
-        '409':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-          description: Conflict - For example if the date is too far back in time
-            and cannot be used
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-          description: Unexpected error
-      summary: Create single time entry
-      tags:
-      - Time entries
       - New endpoints
   /api-first-workbench/time-entries/{time-entry-id}:
     delete:
@@ -625,6 +502,10 @@ paths:
       - Time entries
       - New endpoints
     get:
+      description: "### Overview\nLookup a single time entry. \nTime entry represent\
+        \ hours registered on a specific day towards a cost object.\n\n### Important\
+        \ information\nConsider using the endpoint `/calendar/{start-date}/{end-date}`\
+        \ for retrieving all time entries in the date range.\n"
       operationId: LookupTimeEntry
       parameters:
       - in: path
@@ -644,7 +525,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/NotFoundDetails'
           description: Time entry does not exist for logged in user
         default:
           content:
@@ -682,6 +563,15 @@ paths:
       requestBody:
         content:
           application/json:
+            examples:
+              time-entries-update-all:
+                $ref: '#/components/examples/time-entries-update-all'
+              time-entries-update-comment:
+                $ref: '#/components/examples/time-entries-update-comment'
+              time-entries-update-date:
+                $ref: '#/components/examples/time-entries-update-date'
+              time-entries-update-hours:
+                $ref: '#/components/examples/time-entries-update-hours'
             schema:
               $ref: '#/components/schemas/TimeEntryJsonPatch'
         description: Time entry update
@@ -703,7 +593,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetails'
+                $ref: '#/components/schemas/NotFoundDetails'
           description: Not found - Time entry does not exist for logged in user
         '409':
           content:

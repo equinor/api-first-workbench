@@ -1,13 +1,35 @@
 components:
   examples:
-    wo-update-text:
-      summary: Append text to work order
+    time-entries-update-all:
+      summary: Update all
       value:
-        - op: append
-          path: /text
-          value: |-
-            Text to append
-            Multi-line
+        - op: replace
+          path: /date
+          value: '2021-11-13'
+        - op: replace
+          path: /comment
+          value: Project ZYX
+        - op: replace
+          path: /hours
+          value: 7.5
+    time-entries-update-comment:
+      summary: Update comment
+      value:
+        - op: replace
+          path: /comment
+          value: Project ZYX
+    time-entries-update-date:
+      summary: Move time entry to other date
+      value:
+        - op: replace
+          path: /date
+          value: '2021-11-13'
+    time-entries-update-hours:
+      summary: Update hours
+      value:
+        - op: replace
+          path: /hours
+          value: 7.5
   parameters:
     apiVersion:
       description: api-version must be present in all request as part of the query string
@@ -18,71 +40,6 @@ components:
         enum:
           - v1
         type: string
-  responses:
-    DefaultResponse:
-      content:
-        application/json:
-          schema:
-            additionalProperties: false
-            properties:
-              errors:
-                additionalProperties:
-                  additionalProperties: false
-                  type: object
-                description: Detailed information about error
-                nullable: true
-                readOnly: true
-                type: object
-              status:
-                description: HTTP status code
-                example: 400
-                format: int32
-                nullable: true
-                type: integer
-              title:
-                description: Description of error
-                example: One or more validation errors occurred.
-                nullable: true
-                type: string
-              traceId:
-                description: Request id to be used for support
-                example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
-                type: string
-              type:
-                description: Reference to HTTP status definition
-                example: https://tools.ietf.org/html/rfc7231#section-6.5.1
-                nullable: true
-                type: string
-            type: object
-      description: Response for other HTTP status codes
-    NotFound:
-      content:
-        application/json:
-          schema:
-            additionalProperties: false
-            properties:
-              status:
-                description: HTTP status code
-                example: 404
-                format: int32
-                nullable: true
-                type: integer
-              title:
-                description: Description of error
-                example: Not Found
-                nullable: true
-                type: string
-              traceId:
-                description: Request id to be used for support
-                example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
-                type: string
-              type:
-                description: Reference to HTTP status definition
-                example: https://tools.ietf.org/html/rfc7231#section-6.5.4
-                nullable: true
-                type: string
-            type: object
-      description: The specified resource was not found
   schemas:
     Calendar:
       type: object
@@ -388,45 +345,6 @@ components:
           description: Unique id for time entry
           example: '154632395'
           type: string
-    TimeEntryCreate:
-      required:
-        - date
-        - hours
-        - costObjectTypeId
-        - costObjectId
-      type: object
-      properties:
-        comment:
-          description: Comment for time entry
-          example: Analysis of task xyz
-          maxLength: 40
-          type: string
-        costObjectId:
-          description: Cost object identifier
-          example: C.BAX.30.xxx
-          type: string
-        costObjectTypeId:
-          description: Type of cost object
-          enum:
-            - wbs
-            - network
-          type: string
-        costSubObjectId:
-          description: Secondary cost object identifier. Not use for all cost object types.
-          example: '0100'
-          type: string
-        date:
-          description: Time entry date
-          example: '2021-11-04'
-          format: date
-          type: string
-        hours:
-          description: Number of hours worked
-          example: 8
-          format: double
-          maximum: 24
-          minimum: 0
-          type: number
     TimeEntryJsonPatch:
       type: array
       items:
@@ -451,7 +369,9 @@ components:
               Value to be assigned to a resource property based on the operation
               and path.
             example: '2021-11-11'
-            type: string
+            oneOf:
+              - type: string
+              - type: number
   securitySchemes:
     apiKey:
       description: Subscription key created from https://api.equinor.com
@@ -954,142 +874,6 @@ paths:
       tags:
         - Calendar
         - New endpoints
-  /api-first-workbench/calendar/{start-date}/{end-date}/time-entries:
-    put:
-      description: >
-        ### Overview
-
-        Perform time writing by supplying all time entries for a given calendar
-        period. 
-
-
-        It's also possible to change individual time entries via endpoints `POST
-        /time-entries`,`PATCH /time-entries/{time-entry-id}` and `DELETE
-        /time-entries/{time-entry-id}`.
-
-
-        ### Important information
-
-        This operation overwrites all existing time writing in the given
-        calendar period.  
-
-
-        If there are errors for one or more of the time entries, none of them
-        will be updated.
-      operationId: PutTimeEntriesForCalendar
-      parameters:
-        - in: path
-          name: start-date
-          required: true
-          schema:
-            example: '2021-11-01'
-            format: date
-            type: string
-        - in: path
-          name: end-date
-          required: true
-          schema:
-            example: '2021-11-01'
-            format: date
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              items:
-                properties:
-                  comment:
-                    description: Comment for time entry
-                    example: Analysis of task xyz
-                    maxLength: 40
-                    type: string
-                  costObjectId:
-                    description: Cost object identifier
-                    example: C.BAX.30.xxx
-                    type: string
-                  costObjectTypeId: &ref_1
-                    description: Type of cost object
-                    enum:
-                      - wbs
-                      - network
-                    type: string
-                  costSubObjectId:
-                    description: >-
-                      Secondary cost object identifier. Not use for all cost
-                      object types.
-                    example: '0100'
-                    type: string
-                  date:
-                    description: Time entry date
-                    example: '2021-11-04'
-                    format: date
-                    type: string
-                  hours:
-                    description: Number of hours worked
-                    example: 8
-                    format: double
-                    maximum: 24
-                    minimum: 0
-                    type: number
-                required:
-                  - date
-                  - hours
-                  - costObjectTypeId
-                  - costObjectId
-                type: object
-              type: array
-        description: Time entries
-        required: true
-      responses:
-        '204':
-          description: >-
-            Successful - No content. Lookup result using `GET
-            /calendar/{start-date}/{end-date}`
-        '400':
-          content:
-            application/json:
-              schema: &ref_0
-                additionalProperties: false
-                properties:
-                  errors:
-                    additionalProperties:
-                      additionalProperties: false
-                      type: object
-                    description: Detailed information about error
-                    nullable: true
-                    readOnly: true
-                    type: object
-                  status:
-                    description: HTTP status code
-                    example: 400
-                    format: int32
-                    nullable: true
-                    type: integer
-                  title:
-                    description: Description of error
-                    example: One or more validation errors occurred.
-                    nullable: true
-                    type: string
-                  traceId:
-                    description: Request id to be used for support
-                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
-                    type: string
-                  type:
-                    description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
-                    nullable: true
-                    type: string
-                type: object
-          description: Bad request (for example invalid costObjectId)
-        default:
-          content:
-            application/json:
-              schema: *ref_0
-          description: Unexpected error
-      summary: Perform time writing for calendar (overwrites existing time entries)
-      tags:
-        - Calendar
-        - New endpoints
   /api-first-workbench/cost-objects/{cost-object-id}:
     get:
       description: |
@@ -1154,23 +938,15 @@ paths:
                 type: object
                 additionalProperties: false
                 properties:
-                  errors:
-                    description: Detailed information about error
-                    nullable: true
-                    readOnly: true
-                    type: object
-                    additionalProperties:
-                      type: object
-                      additionalProperties: false
                   status:
                     description: HTTP status code
-                    example: 400
+                    example: 404
                     format: int32
                     nullable: true
                     type: integer
                   title:
                     description: Description of error
-                    example: One or more validation errors occurred.
+                    example: Not Found
                     nullable: true
                     type: string
                   traceId:
@@ -1179,7 +955,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.4
                     nullable: true
                     type: string
           description: Not found - Cost object does not exist
@@ -1223,219 +999,6 @@ paths:
       tags:
         - Cost objects
         - New endpoints
-  /api-first-workbench/time-entries:
-    post:
-      description: |
-        ## Overview
-        Create single time entry.
-      operationId: CreateTimeEntry
-      requestBody:
-        content:
-          application/json:
-            schema:
-              required:
-                - date
-                - hours
-                - costObjectTypeId
-                - costObjectId
-              type: object
-              properties:
-                comment:
-                  description: Comment for time entry
-                  example: Analysis of task xyz
-                  maxLength: 40
-                  type: string
-                costObjectId:
-                  description: Cost object identifier
-                  example: C.BAX.30.xxx
-                  type: string
-                costObjectTypeId:
-                  description: Type of cost object
-                  enum:
-                    - wbs
-                    - network
-                  type: string
-                costSubObjectId:
-                  description: >-
-                    Secondary cost object identifier. Not use for all cost
-                    object types.
-                  example: '0100'
-                  type: string
-                date:
-                  description: Time entry date
-                  example: '2021-11-04'
-                  format: date
-                  type: string
-                hours:
-                  description: Number of hours worked
-                  example: 8
-                  format: double
-                  maximum: 24
-                  minimum: 0
-                  type: number
-        description: Time entry update
-        required: true
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  comment:
-                    description: Comment for time entry
-                    type: string
-                  costObjectDescription:
-                    description: Description of the cost object
-                    example: Project XYZ
-                    type: string
-                  costObjectId:
-                    description: Cost object identifier
-                    example: C.BAX.30.xxx
-                    type: string
-                  costObjectTypeId:
-                    description: Type of cost object
-                    enum:
-                      - wbs
-                      - network
-                    type: string
-                  costSubObjectId:
-                    description: >-
-                      Secondary cost object identifier. Not use for all cost
-                      object types.
-                    example: ''
-                    type: string
-                  date:
-                    description: Time entry date
-                    example: '2021-11-04'
-                    format: date
-                    type: string
-                  hours:
-                    description: Number of hours worked
-                    example: 7.5
-                    format: double
-                    maximum: 24
-                    minimum: 0
-                    type: number
-                  timeEntryId:
-                    description: Unique id for time entry
-                    example: '154632395'
-                    type: string
-          description: Created
-        '400':
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  errors:
-                    description: Detailed information about error
-                    nullable: true
-                    readOnly: true
-                    type: object
-                    additionalProperties:
-                      type: object
-                      additionalProperties: false
-                  status:
-                    description: HTTP status code
-                    example: 400
-                    format: int32
-                    nullable: true
-                    type: integer
-                  title:
-                    description: Description of error
-                    example: One or more validation errors occurred.
-                    nullable: true
-                    type: string
-                  traceId:
-                    description: Request id to be used for support
-                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
-                    type: string
-                  type:
-                    description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
-                    nullable: true
-                    type: string
-          description: Bad request - For example too many hours
-        '409':
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  errors:
-                    description: Detailed information about error
-                    nullable: true
-                    readOnly: true
-                    type: object
-                    additionalProperties:
-                      type: object
-                      additionalProperties: false
-                  status:
-                    description: HTTP status code
-                    example: 400
-                    format: int32
-                    nullable: true
-                    type: integer
-                  title:
-                    description: Description of error
-                    example: One or more validation errors occurred.
-                    nullable: true
-                    type: string
-                  traceId:
-                    description: Request id to be used for support
-                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
-                    type: string
-                  type:
-                    description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
-                    nullable: true
-                    type: string
-          description: >-
-            Conflict - For example if the date is too far back in time and
-            cannot be used
-        default:
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                properties:
-                  errors:
-                    description: Detailed information about error
-                    nullable: true
-                    readOnly: true
-                    type: object
-                    additionalProperties:
-                      type: object
-                      additionalProperties: false
-                  status:
-                    description: HTTP status code
-                    example: 400
-                    format: int32
-                    nullable: true
-                    type: integer
-                  title:
-                    description: Description of error
-                    example: One or more validation errors occurred.
-                    nullable: true
-                    type: string
-                  traceId:
-                    description: Request id to be used for support
-                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
-                    type: string
-                  type:
-                    description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
-                    nullable: true
-                    type: string
-          description: Unexpected error
-      summary: Create single time entry
-      tags:
-        - Time entries
-        - New endpoints
   /api-first-workbench/time-entries/{time-entry-id}:
     delete:
       description: |
@@ -1455,7 +1018,38 @@ paths:
         '404':
           content:
             application/json:
-              schema: *ref_0
+              schema: &ref_0
+                additionalProperties: false
+                properties:
+                  errors:
+                    additionalProperties:
+                      additionalProperties: false
+                      type: object
+                    description: Detailed information about error
+                    nullable: true
+                    readOnly: true
+                    type: object
+                  status:
+                    description: HTTP status code
+                    example: 400
+                    format: int32
+                    nullable: true
+                    type: integer
+                  title:
+                    description: Description of error
+                    example: One or more validation errors occurred.
+                    nullable: true
+                    type: string
+                  traceId:
+                    description: Request id to be used for support
+                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+                    type: string
+                  type:
+                    description: Reference to HTTP status definition
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    nullable: true
+                    type: string
+                type: object
           description: Not found - Time entry does not exist for logged in user
         '409':
           content:
@@ -1474,6 +1068,19 @@ paths:
         - Time entries
         - New endpoints
     get:
+      description: >
+        ### Overview
+
+        Lookup a single time entry. 
+
+        Time entry represent hours registered on a specific day towards a cost
+        object.
+
+
+        ### Important information
+
+        Consider using the endpoint `/calendar/{start-date}/{end-date}` for
+        retrieving all time entries in the date range.
       operationId: LookupTimeEntry
       parameters:
         - in: path
@@ -1536,23 +1143,15 @@ paths:
                 type: object
                 additionalProperties: false
                 properties:
-                  errors:
-                    description: Detailed information about error
-                    nullable: true
-                    readOnly: true
-                    type: object
-                    additionalProperties:
-                      type: object
-                      additionalProperties: false
                   status:
                     description: HTTP status code
-                    example: 400
+                    example: 404
                     format: int32
                     nullable: true
                     type: integer
                   title:
                     description: Description of error
-                    example: One or more validation errors occurred.
+                    example: Not Found
                     nullable: true
                     type: string
                   traceId:
@@ -1561,7 +1160,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.4
                     nullable: true
                     type: string
           description: Time entry does not exist for logged in user
@@ -1625,6 +1224,37 @@ paths:
       requestBody:
         content:
           application/json:
+            examples:
+              time-entries-update-all:
+                summary: Update all
+                value:
+                  - op: replace
+                    path: /date
+                    value: '2021-11-13'
+                  - op: replace
+                    path: /comment
+                    value: Project ZYX
+                  - op: replace
+                    path: /hours
+                    value: 7.5
+              time-entries-update-comment:
+                summary: Update comment
+                value:
+                  - op: replace
+                    path: /comment
+                    value: Project ZYX
+              time-entries-update-date:
+                summary: Move time entry to other date
+                value:
+                  - op: replace
+                    path: /date
+                    value: '2021-11-13'
+              time-entries-update-hours:
+                summary: Update hours
+                value:
+                  - op: replace
+                    path: /hours
+                    value: 7.5
             schema:
               items:
                 properties:
@@ -1649,7 +1279,9 @@ paths:
                       Value to be assigned to a resource property based on the
                       operation and path.
                     example: '2021-11-11'
-                    type: string
+                    oneOf:
+                      - type: string
+                      - type: number
                 type: object
               type: array
         description: Time entry update
@@ -1671,7 +1303,12 @@ paths:
                     description: Cost object identifier
                     example: C.BAX.30.xxx
                     type: string
-                  costObjectTypeId: *ref_1
+                  costObjectTypeId:
+                    description: Type of cost object
+                    enum:
+                      - wbs
+                      - network
+                    type: string
                   costSubObjectId:
                     description: >-
                       Secondary cost object identifier. Not use for all cost
@@ -1704,7 +1341,30 @@ paths:
         '404':
           content:
             application/json:
-              schema: *ref_0
+              schema:
+                additionalProperties: false
+                properties:
+                  status:
+                    description: HTTP status code
+                    example: 404
+                    format: int32
+                    nullable: true
+                    type: integer
+                  title:
+                    description: Description of error
+                    example: Not Found
+                    nullable: true
+                    type: string
+                  traceId:
+                    description: Request id to be used for support
+                    example: 00-d9dc368e6caec4449a64e798dad1b5b2-7d82bdde82c9474a-00
+                    type: string
+                  type:
+                    description: Reference to HTTP status definition
+                    example: https://tools.ietf.org/html/rfc7231#section-6.5.4
+                    nullable: true
+                    type: string
+                type: object
           description: Not found - Time entry does not exist for logged in user
         '409':
           content:
