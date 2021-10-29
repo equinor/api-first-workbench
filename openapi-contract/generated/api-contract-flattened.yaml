@@ -393,7 +393,11 @@ info:
     name: Maintenance API Team - GBS IT PLA POM
     url: https://github.com/equinor/api-first-workbench
   description: >
-    The {{API_NAME}} API is an open API covering the {{BUSINESS_AREA}} area.
+    The Timewriting API is an open API covering the HR area.
+
+    It's an example API used to demonstrate the
+    [api-first-workbench](https://github.com/equinor/api-first-workbench) and
+    has not been implemented.
 
 
     This document describes release v1.0.0. We recommend using documentation
@@ -671,7 +675,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/
-  title: '{{API_NAME}} API'
+  title: Timewriting API
   version: 1.0.0
   x-logo:
     altText: Maintenance API logo
