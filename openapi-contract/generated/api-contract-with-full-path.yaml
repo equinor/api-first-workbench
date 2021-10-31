@@ -425,7 +425,6 @@ paths:
       summary: Lookup calendar for a date range
       tags:
       - Calendar
-      - New endpoints
   /api-first-workbench/cost-objects/{cost-object-id}:
     get:
       description: "### Overview\nLookup a single cost object. \n\nThe cost object\
@@ -460,7 +459,6 @@ paths:
       summary: Lookup single cost object
       tags:
       - Cost objects
-      - New endpoints
   /api-first-workbench/time-entries/{time-entry-id}:
     delete:
       description: '## Overview
@@ -501,7 +499,6 @@ paths:
       summary: Delete single time entry
       tags:
       - Time entries
-      - New endpoints
     get:
       description: "### Overview\nLookup a single time entry. \nTime entry represent\
         \ hours registered on a specific day towards a cost object.\n\n### Important\
@@ -537,7 +534,6 @@ paths:
       summary: Lookup single time entry
       tags:
       - Time entries
-      - New endpoints
     patch:
       description: '## Overview
 
@@ -612,7 +608,6 @@ paths:
       summary: Update single time entry
       tags:
       - Time entries
-      - New endpoints
 security:
 - bearerAuth: []
 - apiKey: []
