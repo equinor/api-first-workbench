@@ -12,7 +12,7 @@ spec:
   environments:
     - name: test
       build:
-        from: release/v1.0.0
+        from: release/v1.1.0
   components:
     - name: proxy
       dockerfileName: openapi-proxy-validator/openapi_proxy_validator.Dockerfile
