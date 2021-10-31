@@ -245,6 +245,63 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'           
 
+  /calendar/{start-date}/{end-date}/time-entries:
+    put:
+      operationId: PutTimeEntriesForCalendar
+      summary: Perform time writing for calendar (overwrites existing time entries)
+      description: |
+        ### Overview
+        Perform time writing by supplying all time entries for a given calendar period.
+        It's also possible to change individual time entries via endpoints `POST /time-entries`,`PATCH /time-entries/{time-entry-id}` and `DELETE /time-entries/{time-entry-id}`.
+        ### Important information
+        This operation overwrites all existing time writing in the given calendar period.
+        If there are errors for one or more of the time entries, none of them will be updated.
+      tags:
+        - Calendar
+        - New endpoints
+      parameters:
+        - in: path
+          name: start-date
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2021-11-01'
+        - in: path
+          name: end-date
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2021-11-01'
+      requestBody:
+        description: Time entries
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TimeEntryCreate'
+            examples:
+              calendar-time-entries-put:
+                $ref: '#/components/examples/calendar-time-entries-put'
+      responses:
+        '204':
+          description: Successful - No content. Lookup result using `GET /calendar/{start-date}/{end-date}`
+        '400':
+          description: Bad request (for example invalid costObjectId)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
                 
   /time-entries/{time-entry-id}:                
     get:
@@ -789,5 +846,18 @@ components:
         costObjectTypeId: 'network'
         costObjectId: '9000000'
         costSubObjectId: '10'
-        comment: 'Analysis of task xyz'        
-        
+        comment: 'Analysis of task xyz'
+    calendar-time-entries-put:
+      summary: Set time entries for period
+      value: 
+        - date: '2021-11-04'
+          hours: 8
+          costObjectTypeId: 'wbs'
+          costObjectId: 'C.BAX.30.xxx'
+          comment: 'Analysis of task xyz'      
+        - date: '2021-11-05'
+          hours: 4.5
+          costObjectTypeId: 'network'
+          costObjectId: '9000000'
+          costSubObjectId: '10'
+          comment: 'Analysis of task xyz'
