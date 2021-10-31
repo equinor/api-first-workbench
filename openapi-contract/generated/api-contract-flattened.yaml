@@ -470,7 +470,7 @@ info:
     has not been implemented.
 
 
-    This document describes release v1.0.0. We recommend using documentation
+    This document describes release v1.0.1. We recommend using documentation
     published at https://equinor.github.io/api-first-workbench as it provides
     the best developer experience.
 
@@ -746,7 +746,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/
   title: Timewriting API
-  version: 1.0.0
+  version: 1.0.1
   x-logo:
     altText: Maintenance API logo
     url: https://equinor.github.io/api-first-workbench/img/logo.png
@@ -1819,7 +1819,7 @@ tags:
       Cost object represent how the cost for each time entry is allocated
     name: Cost objects
 x-tagGroups:
-  - name: Changes in 1.0.0
+  - name: Changes in 1.0.1
     tags:
       - New endpoints
       - Modified endpoints
