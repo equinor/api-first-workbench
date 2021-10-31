@@ -271,10 +271,10 @@ info:
     url: https://github.com/equinor/api-first-workbench
   description: "The Timewriting API is an open API covering the HR area.\nIt's an\
     \ example API used to demonstrate the [api-first-workbench](https://github.com/equinor/api-first-workbench)\
-    \ and has not been implemented.\n\nThis document describes release v1.0.0. We\
-    \ recommend using documentation published at https://equinor.github.io/api-first-workbench\
+    \ and has not been implemented.\n\nThis document describes upcoming release v1.1.0.\
+    \ We recommend using documentation published at https://equinor.github.io/api-first-workbench/v1.1.0\
     \ as it provides the best developer experience.\nInformation on the next release\
-    \ v1.1.0 is available at [this page](https://equinor.github.io/api-first-workbench/latest/)\n\
+    \ v1.2.0 is available at [this page](https://equinor.github.io/api-first-workbench/1.2.0/)\n\
     \n# Introduction\nThe API is designed and built according to [Equinor's API strategy](https://github.com/equinor/api-strategy).\n\
     \nThe API is documented in OpenAPI 3.0 format and follows REST principles.\n\n\
     ## Terminology\nThe API will use common terminology used across the Oil&Gas industry.\n\
@@ -367,7 +367,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/
   title: Timewriting API
-  version: 1.0.0
+  version: 1.1.0
   x-logo:
     altText: Maintenance API logo
     url: https://equinor.github.io/api-first-workbench/img/logo.png
@@ -425,7 +425,6 @@ paths:
       summary: Lookup calendar for a date range
       tags:
       - Calendar
-      - New endpoints
   /api-first-workbench/cost-objects/{cost-object-id}:
     get:
       description: "### Overview\nLookup a single cost object. \n\nThe cost object\
@@ -460,7 +459,6 @@ paths:
       summary: Lookup single cost object
       tags:
       - Cost objects
-      - New endpoints
   /api-first-workbench/time-entries/{time-entry-id}:
     delete:
       description: '## Overview
@@ -501,7 +499,6 @@ paths:
       summary: Delete single time entry
       tags:
       - Time entries
-      - New endpoints
     get:
       description: "### Overview\nLookup a single time entry. \nTime entry represent\
         \ hours registered on a specific day towards a cost object.\n\n### Important\
@@ -537,7 +534,6 @@ paths:
       summary: Lookup single time entry
       tags:
       - Time entries
-      - New endpoints
     patch:
       description: '## Overview
 
@@ -612,7 +608,6 @@ paths:
       summary: Update single time entry
       tags:
       - Time entries
-      - New endpoints
 security:
 - bearerAuth: []
 - apiKey: []
@@ -641,7 +636,7 @@ tags:
     '
   name: Cost objects
 x-tagGroups:
-- name: Changes in 1.0.0
+- name: Changes in 1.1.0
   tags:
   - New endpoints
   - Modified endpoints
