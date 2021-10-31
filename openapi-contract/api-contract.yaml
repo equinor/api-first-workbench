@@ -5,7 +5,7 @@ info:
     The Timewriting API is an open API covering the HR area.
     It's an example API used to demonstrate the [api-first-workbench](https://github.com/equinor/api-first-workbench) and has not been implemented.
 
-    This document describes release v1.0.0. We recommend using documentation published at https://equinor.github.io/api-first-workbench as it provides the best developer experience.
+    This document describes release v1.0.1. We recommend using documentation published at https://equinor.github.io/api-first-workbench as it provides the best developer experience.
     Information on the next release v1.1.0 is available at [this page](https://equinor.github.io/api-first-workbench/latest/)
 
     # Introduction
@@ -135,7 +135,7 @@ info:
 
     # Feature requests
     Feature requests are welcomed and can be submitted through: 
-  version: "1.0.0"
+  version: "1.0.1"
 
   contact:
     name: Maintenance API Team - GBS IT PLA POM
@@ -179,7 +179,7 @@ tags:
       Cost object represent how the cost for each time entry is allocated
 
 x-tagGroups:
-  - name: Changes in 1.0.0
+  - name: Changes in 1.0.1
     tags:
       - New endpoints
       - Modified endpoints

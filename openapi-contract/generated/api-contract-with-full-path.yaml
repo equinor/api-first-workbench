@@ -338,7 +338,7 @@ info:
     url: https://github.com/equinor/api-first-workbench
   description: "The Timewriting API is an open API covering the HR area.\nIt's an\
     \ example API used to demonstrate the [api-first-workbench](https://github.com/equinor/api-first-workbench)\
-    \ and has not been implemented.\n\nThis document describes release v1.0.0. We\
+    \ and has not been implemented.\n\nThis document describes release v1.0.1. We\
     \ recommend using documentation published at https://equinor.github.io/api-first-workbench\
     \ as it provides the best developer experience.\nInformation on the next release\
     \ v1.1.0 is available at [this page](https://equinor.github.io/api-first-workbench/latest/)\n\
@@ -434,7 +434,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/
   title: Timewriting API
-  version: 1.0.0
+  version: 1.0.1
   x-logo:
     altText: Maintenance API logo
     url: https://equinor.github.io/api-first-workbench/img/logo.png
@@ -818,7 +818,7 @@ tags:
     '
   name: Cost objects
 x-tagGroups:
-- name: Changes in 1.0.0
+- name: Changes in 1.0.1
   tags:
   - New endpoints
   - Modified endpoints
