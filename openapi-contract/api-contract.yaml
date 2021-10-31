@@ -203,7 +203,6 @@ paths:
         TBD
       tags:
         - Calendar
-        - New endpoints
       parameters:
         - in: path
           name: start-date
@@ -260,7 +259,6 @@ paths:
         Consider using the endpoint `/calendar/{start-date}/{end-date}` for retrieving all time entries in the date range.
       tags:
         - Time entries
-        - New endpoints
       parameters:
         - in: path
           name: time-entry-id
@@ -300,7 +298,6 @@ paths:
         - Update date
       tags:
         - Time entries
-        - New endpoints
       parameters:
         - in: path
           name: time-entry-id
@@ -363,7 +360,6 @@ paths:
         Delete single time entry.
       tags:
         - Time entries
-        - New endpoints
       parameters:
         - in: path
           name: time-entry-id
@@ -404,7 +400,6 @@ paths:
         The cost object is used when creating a new time entry.
       tags:
         - Cost objects
-        - New endpoints
       parameters:
         - in: path
           name: cost-object-id
