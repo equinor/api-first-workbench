@@ -1,11 +1,25 @@
 /*
 * To be place in the Test tab at the collection level 
+* 
+* Test 1: Verify expectedHTTPStatusCode defined in endpoint pre-request script matches response
+*
+* Test 2: Create dynamic test in case OpenAPI validating proxy returns any errors
 * The sl-violations HTTP response header is populate from Prism with any disrepancies from the OpenAPI contract
 * This code converts the errors from Prism, into failed tests in Postman
 * Prism documentation: https://meta.stoplight.io/docs/prism
 * 
 * 
 */
+if (typeof expectedHTTPStatusCode ==='undefined'){
+      pm.test('Configuration: expectedHTTPStatusCode', function () {
+        pm.expect.fail('Endpoint has not defined a value for expectedHTTPStatusCode in pre-request test')
+    });  
+}else {
+    pm.test('Request matches expected HTTP status code ' + expectedHTTPStatusCode, function () {
+        pm.response.to.have.status(expectedHTTPStatusCode);
+    });
+}
+
 const errorString = pm.response.headers.get('sl-violations')
 
 if (!errorString)
@@ -31,3 +45,4 @@ for (let i = 0; i < errors.length; i++) {
         
     })
 }
+
