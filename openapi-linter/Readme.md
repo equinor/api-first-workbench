@@ -17,6 +17,6 @@ The ruleset of spectral is defined in file `openapi-linter/.spectral.yml`.
 
 ## Custom rules
 `operation-description` - Error (and not just warning) if description is missing for an operation  
-`oas3-valid-oas-content-example`- Error (and not just warning) if examples do not follow the data schema of the operation
-`operation-tag-defined`- Error (and not just warning) if there is no tag for an operation 
-`patch-post-must-have-examples` - Custom rule for requiring examples when using patch and post verbs for an operation
+`oas3-valid-oas-content-example`- Error (and not just warning) if examples do not follow the data schema of the operation  
+`operation-tag-defined`- Error (and not just warning) if there is no tag for an operation  
+`patch-post-must-have-examples` - Custom rule for requiring examples when using patch and post verbs for an operation  
