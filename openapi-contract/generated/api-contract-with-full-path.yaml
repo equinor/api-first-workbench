@@ -593,11 +593,22 @@ paths:
       - Cost objects
   /api-first-workbench/time-entries:
     post:
-      description: '## Overview
-
-        Create single time entry.
-
-        '
+      description: "### Overview\nCreate single time entry for logged on user. \n\n\
+        Clients should expect end users to have prexisting knowledge of the cost object\
+        \ to use for a time entry, but can assist them by providing suggestions based\
+        \ on earlier time entries from endpoint `/calendar/{start-date}/{end-date}`.\
+        \ A general search for cost objects used in the company will not be provided\
+        \ as it increases the risk for wrong time writing.\n\nThe time entry will\
+        \ need approval by the task owner of the cost object after registration. It's\
+        \ recommended to provide a comment where possible in order ease the approval\
+        \ process. If the approver does not have enough information, the time entry\
+        \ will be sent back to the end user through the workflow inbox of the ERP\
+        \ system.\n\nThe client is recommended to verify that the cost object exist\
+        \ and is open for time writing through the endpoint `/cost-objects/{cost-object-id}`.\n\
+        \n### Important information\nThe endpoint does not currently support clock\
+        \ times. If logged on user is configured for clock times, the request will\
+        \ fail with a `409 - Conflict` error.\n\nThe request will fail with a `409\
+        \ - Conflict` error if the date is more than 3 months in the past.\n"
       operationId: CreateTimeEntry
       requestBody:
         content:
@@ -617,13 +628,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TimeEntry'
-          description: Created
+          description: Created - Time entry created successfully
         '400':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-          description: Bad request - For example too many hours
+          description: Bad request - For example more than hours in request is larger
+            than 24
         '409':
           content:
             application/json:
