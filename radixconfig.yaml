@@ -13,6 +13,9 @@ spec:
     - name: test
       build:
         from: release/v1.1.0
+    - name: qa
+      build:
+        from: release/v1.0.1        
   components:
     - name: proxy
       dockerfileName: openapi-proxy-validator/openapi_proxy_validator.Dockerfile
