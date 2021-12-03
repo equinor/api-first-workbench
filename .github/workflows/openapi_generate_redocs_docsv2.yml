@@ -1,0 +1,28 @@
+name: OpenAPI generate docs v2
+# Redoc: https://github.com/Redocly/redoc
+# Creates OpenAPI documentation based on the OpenAPI contract.
+# Uses snippet-encricher-cli https://github.com/cdwv/oas3-api-snippet-enricher to add code examples to the developer documentation.
+# The OpenAPI documentation is configured to be published to Github pages (uses branch gh-pages-source as a base).
+# Updated for every commit of the openapi-contract/*.yaml
+# If commit is done in a branch, this will be represented in the url path.
+
+on: 
+  #Triggered only manually for now
+  workflow_dispatch:
+    
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/redocly/redoc/cli:v2.0.0-rc.58
+    name: Generate docs
+    steps:
+
+      # first checkout your code
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: redoc-cli
+        shell: bash
+        run: |
+          redoc-cli bundle openapi-contract/api-contract.yaml -o index.html -t openapi-contract/redoc-template/redoc-template.hbs --options.requiredPropsFirst=true --options.jsonSampleExpandLevel=3 --options.theme.spacing.sectionVertical=10 --options.theme.typography.fontFamily=Equinor,Roboto,sans-serif --options.theme.colors.primary.main=#007079
