@@ -24,4 +24,4 @@ jobs:
       
       - name: redoc-cli
         run: |
-          bundle openapi-contract/api-contract.yaml -o index.html -t openapi-contract/redoc-template/redoc-template.hbs --options.requiredPropsFirst=true --options.jsonSampleExpandLevel=3 --options.theme.spacing.sectionVertical=10 --options.theme.typography.fontFamily=Equinor,Roboto,sans-serif --options.theme.colors.primary.main=#007079
+          redoc-cli bundle openapi-contract/api-contract.yaml -o index.html -t openapi-contract/redoc-template/redoc-template.hbs --options.requiredPropsFirst=true --options.jsonSampleExpandLevel=3 --options.theme.spacing.sectionVertical=10 --options.theme.typography.fontFamily=Equinor,Roboto,sans-serif --options.theme.colors.primary.main=#007079
