@@ -17,7 +17,6 @@ jobs:
       image: ghcr.io/redocly/redoc/cli:v2.0.0-rc.58
     name: Generate docs
     steps:
-
       # first checkout your code
       - name: Checkout
         uses: actions/checkout@v2
@@ -30,7 +29,10 @@ jobs:
         with:
           name: redoc-index
           path: indexv2.html
-        #Checkout gh-pages-source branch in order to update github pages
+  upload-docs:
+    runs-on: ubuntu-latest
+    name: Upload docs
+    steps:
       - uses: actions/checkout@v2
         with:
           ref: gh-pages-source 
@@ -38,11 +40,22 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: redoc-index
+      - name: Get branch environment variable
+        shell: bash
+        run: echo "GITHUB_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Main branch copy
+        if: env.GITHUB_BRANCH == 'main'
         run: mv indexv2.html docs/
+      - name: Copy to latest if not main
+        if: env.GITHUB_BRANCH != 'main' 
+        run: mkdir -p docs/latest  && cp indexv2.html docs/latest
+      - name: Move to normal release branch
+        if: env.GITHUB_BRANCH != 'main' 
+        run: mkdir -p docs/$GITHUB_BRANCH  && mv indexv2.html docs/$GITHUB_BRANCH
+      # commit generated redoc to gh-pages-source  branch
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: gh-pages-source
           commit_message: 'auto: Generated updated redoc developer documentation'
           commit_user_name: Github actions bot
-          commit_user_email: dapa@equinor.com
+          commit_user_email: dapa@equinor.com          
