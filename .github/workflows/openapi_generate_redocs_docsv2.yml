@@ -24,33 +24,22 @@ jobs:
       
       - name: redoc-cli
         run: |
-          redoc-cli bundle openapi-contract/api-contract.yaml -o index.html -t openapi-contract/redoc-template/redoc-template.hbs --options.requiredPropsFirst=true --options.jsonSampleExpandLevel=3 --options.theme.spacing.sectionVertical=10 --options.theme.typography.fontFamily=Equinor,Roboto,sans-serif --options.theme.colors.primary.main=#007079
-      - name: Upload redoc index.html file
+          redoc-cli bundle openapi-contract/api-contract.yaml -o indexv2.html -t openapi-contract/redoc-template/redoc-template.hbs --options.requiredPropsFirst=true --options.jsonSampleExpandLevel=3 --options.theme.spacing.sectionVertical=10 --options.theme.typography.fontFamily=Equinor,Roboto,sans-serif --options.theme.colors.primary.main=#007079
+      - name: Upload redoc indexv2.html file
         uses: actions/upload-artifact@v2
         with:
           name: redoc-index
-          path: index.html
+          path: indexv2.html
         #Checkout gh-pages-source branch in order to update github pages
       - uses: actions/checkout@v2
         with:
           ref: gh-pages-source 
-      - name: Download redoc index.html file
+      - name: Download redoc indexv2.html file
         uses: actions/download-artifact@v2
         with:
           name: redoc-index
-      - name: Get branch environment variable
-        shell: bash
-        run: echo "GITHUB_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Main branch copy
-        if: env.GITHUB_BRANCH == 'main'
-        run: mv index.html docs/
-      - name: Copy to latest if not main
-        if: env.GITHUB_BRANCH != 'main' 
-        run: mkdir -p docs/latest  && cp index.html docs/latest
-      - name: Move to normal release branch
-        if: env.GITHUB_BRANCH != 'main' 
-        run: mkdir -p docs/$GITHUB_BRANCH  && mv index.html docs/$GITHUB_BRANCH
-      # commit generated redoc to gh-pages-source  branch
+        run: mv indexv2.html docs/
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: gh-pages-source
