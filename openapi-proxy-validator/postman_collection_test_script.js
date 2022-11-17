@@ -22,8 +22,17 @@ if (typeof expectedHTTPStatusCode ==='undefined'){
 
 const errorString = pm.response.headers.get('sl-violations')
 
-if (!errorString)
-    return
+if (!errorString){
+    if (pm.request.url.getHost().indexOf('prism')!==-1){
+        pm.test('Request validated according to API contract through Prism', function () {
+            pm.expect(true).to.eql(true,'')      
+        });    
+        pm.test('Response validated according to API contract through Prism', function () {
+            pm.expect(true).to.eql(true,'')      
+        });   
+    }
+    return;
+}
 
 const errors = JSON.parse(errorString)
 
