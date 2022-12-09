@@ -1,5 +1,19 @@
 components:
   examples:
+    calendar-time-entries-put:
+      summary: Set time entries for period
+      value:
+      - comment: Analysis of task xyz
+        costObjectId: C.BAX.30.xxx
+        costObjectTypeId: wbs
+        date: '2021-11-04'
+        hours: 8
+      - comment: Analysis of task xyz
+        costObjectId: '9000000'
+        costObjectTypeId: network
+        costSubObjectId: '10'
+        date: '2021-11-05'
+        hours: 4.5
     time-entries-update-all:
       summary: Update all
       value:
@@ -30,6 +44,23 @@ components:
       - op: replace
         path: /hours
         value: 7.5
+    time-entry-create-network:
+      summary: Create time entry (network)
+      value:
+        comment: Analysis of task xyz
+        costObjectId: '9000000'
+        costObjectTypeId: network
+        costSubObjectId: '10'
+        date: '2021-11-05'
+        hours: 4.5
+    time-entry-create-wbs:
+      summary: Create time entry (wbs)
+      value:
+        comment: Analysis of task xyz
+        costObjectId: C.BAX.30.xxx
+        costObjectTypeId: wbs
+        date: '2021-11-04'
+        hours: 8
   parameters:
     apiVersion:
       description: api-version must be present in all request as part of the query
@@ -221,6 +252,42 @@ components:
           example: '154632395'
           type: string
       type: object
+    TimeEntryCreate:
+      properties:
+        comment:
+          description: Comment for time entry
+          example: Analysis of task xyz
+          maxLength: 40
+          type: string
+        costObjectId:
+          description: Cost object identifier
+          example: C.BAX.30.xxx
+          type: string
+        costObjectTypeId:
+          $ref: '#/components/schemas/CostObjectTypes'
+        costSubObjectId:
+          description: Secondary cost object identifier. Not use for all cost object
+            types.
+          example: '0100'
+          type: string
+        date:
+          description: Time entry date
+          example: '2021-11-04'
+          format: date
+          type: string
+        hours:
+          description: Number of hours worked
+          example: 8.0
+          format: double
+          maximum: 24
+          minimum: 0
+          type: number
+      required:
+      - date
+      - hours
+      - costObjectTypeId
+      - costObjectId
+      type: object
     TimeEntryJsonPatch:
       items:
         properties:
@@ -271,7 +338,7 @@ info:
     url: https://github.com/equinor/api-first-workbench
   description: "The Timewriting API is an open API covering the HR area.\nIt's an\
     \ example API used to demonstrate the [api-first-workbench](https://github.com/equinor/api-first-workbench)\
-    \ and has not been implemented.\n\nThis document describes release v1.0.0. We\
+    \ and has not been implemented.\n\nThis document describes release v1.0.1. We\
     \ recommend using documentation published at https://equinor.github.io/api-first-workbench\
     \ as it provides the best developer experience.\nInformation on the next release\
     \ v1.1.0 is available at [this page](https://equinor.github.io/api-first-workbench/latest/)\n\
@@ -367,7 +434,7 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/
   title: Timewriting API
-  version: 1.0.0
+  version: 1.0.1
   x-logo:
     altText: Maintenance API logo
     url: https://equinor.github.io/api-first-workbench/img/logo.png
@@ -425,6 +492,70 @@ paths:
       summary: Lookup calendar for a date range
       tags:
       - Calendar
+  /api-first-workbench/calendar/{start-date}/{end-date}/time-entries:
+    put:
+      description: '### Overview
+
+        Perform time writing by supplying all time entries for a given calendar period.
+
+        It''s also possible to change individual time entries via endpoints `POST
+        /time-entries`,`PATCH /time-entries/{time-entry-id}` and `DELETE /time-entries/{time-entry-id}`.
+
+        ### Important information
+
+        This operation overwrites all existing time writing in the given calendar
+        period.
+
+        If there are errors for one or more of the time entries, none of them will
+        be updated.
+
+        '
+      operationId: PutTimeEntriesForCalendar
+      parameters:
+      - in: path
+        name: start-date
+        required: true
+        schema:
+          example: '2021-11-01'
+          format: date
+          type: string
+      - in: path
+        name: end-date
+        required: true
+        schema:
+          example: '2021-11-01'
+          format: date
+          type: string
+      requestBody:
+        content:
+          application/json:
+            examples:
+              calendar-time-entries-put:
+                $ref: '#/components/examples/calendar-time-entries-put'
+            schema:
+              items:
+                $ref: '#/components/schemas/TimeEntryCreate'
+              type: array
+        description: Time entries
+        required: true
+      responses:
+        '204':
+          description: Successful - No content. Lookup result using `GET /calendar/{start-date}/{end-date}`
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad request (for example invalid costObjectId)
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Unexpected error
+      summary: Perform time writing for calendar (overwrites existing time entries)
+      tags:
+      - Calendar
       - New endpoints
   /api-first-workbench/cost-objects/{cost-object-id}:
     get:
@@ -460,6 +591,67 @@ paths:
       summary: Lookup single cost object
       tags:
       - Cost objects
+  /api-first-workbench/time-entries:
+    post:
+      description: "### Overview\nCreate single time entry for logged on user. \n\n\
+        Clients should expect end users to have prexisting knowledge of the cost object\
+        \ to use for a time entry, but can assist them by providing suggestions based\
+        \ on earlier time entries from endpoint `/calendar/{start-date}/{end-date}`.\
+        \ A general search for cost objects used in the company will not be provided\
+        \ as it increases the risk for wrong time writing.\n\nThe time entry will\
+        \ need approval by the task owner of the cost object after registration. It's\
+        \ recommended to provide a comment where possible in order ease the approval\
+        \ process. If the approver does not have enough information, the time entry\
+        \ will be sent back to the end user through the workflow inbox of the ERP\
+        \ system.\n\nThe client is recommended to verify that the cost object exist\
+        \ and is open for time writing through the endpoint `/cost-objects/{cost-object-id}`.\n\
+        \n### Important information\nThe endpoint does not currently support clock\
+        \ times. If logged on user is configured for clock times, the request will\
+        \ fail with a `409 - Conflict` error.\n\nThe request will fail with a `409\
+        \ - Conflict` error if the date is more than 3 months in the past.\n"
+      operationId: CreateTimeEntry
+      requestBody:
+        content:
+          application/json:
+            examples:
+              time-entry-create-network:
+                $ref: '#/components/examples/time-entry-create-network'
+              time-entry-create-wbs:
+                $ref: '#/components/examples/time-entry-create-wbs'
+            schema:
+              $ref: '#/components/schemas/TimeEntryCreate'
+        description: Time entry update
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEntry'
+          description: Created - Time entry created successfully
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad request - For example more than hours in request is larger
+            than 24
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Conflict - For example if the date is too far back in time
+            and cannot be used
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Unexpected error
+      summary: Create single time entry
+      tags:
+      - Time entries
       - New endpoints
   /api-first-workbench/time-entries/{time-entry-id}:
     delete:
@@ -501,7 +693,6 @@ paths:
       summary: Delete single time entry
       tags:
       - Time entries
-      - New endpoints
     get:
       description: "### Overview\nLookup a single time entry. \nTime entry represent\
         \ hours registered on a specific day towards a cost object.\n\n### Important\
@@ -537,7 +728,6 @@ paths:
       summary: Lookup single time entry
       tags:
       - Time entries
-      - New endpoints
     patch:
       description: '## Overview
 
@@ -612,7 +802,6 @@ paths:
       summary: Update single time entry
       tags:
       - Time entries
-      - New endpoints
 security:
 - bearerAuth: []
 - apiKey: []
@@ -641,7 +830,7 @@ tags:
     '
   name: Cost objects
 x-tagGroups:
-- name: Changes in 1.0.0
+- name: Changes in 1.0.1
   tags:
   - New endpoints
   - Modified endpoints
