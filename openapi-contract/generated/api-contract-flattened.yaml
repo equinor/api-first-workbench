@@ -301,7 +301,7 @@ components:
           type: string
         type:
           description: Reference to HTTP status definition
-          example: https://tools.ietf.org/html/rfc7231#section-6.5.4
+          example: 'https://tools.ietf.org/html/rfc7231#section-6.5.4'
           nullable: true
           type: string
     ProblemDetails:
@@ -333,7 +333,7 @@ components:
           type: string
         type:
           description: Reference to HTTP status definition
-          example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+          example: 'https://tools.ietf.org/html/rfc7231#section-6.5.1'
           nullable: true
           type: string
     TimeEntry:
@@ -444,7 +444,7 @@ components:
               - type: number
   securitySchemes:
     apiKey:
-      description: Subscription key created from https://api.equinor.com
+      description: 'Subscription key created from https://api.equinor.com'
       in: header
       name: ocp-apim-subscription-key
       type: apiKey
@@ -453,15 +453,15 @@ components:
         authorizationCode:
           authorizationUrl: >-
             https://login.windows.net/common/oauth2/authorize?resource=0e595101-1f08-4ce0-8684-148b2e2b8e18
-          tokenUrl: https://login.microsoftonline.com/common/oauth2/token
+          tokenUrl: 'https://login.microsoftonline.com/common/oauth2/token'
       type: oauth2
 externalDocs:
   description: API documentation
-  url: https://equinor.github.io/api-first-workbench
+  url: 'https://equinor.github.io/api-first-workbench'
 info:
   contact:
     name: Maintenance API Team - GBS IT PLA POM
-    url: https://github.com/equinor/api-first-workbench
+    url: 'https://github.com/equinor/api-first-workbench'
   description: >
     The Timewriting API is an open API covering the HR area.
 
@@ -744,15 +744,15 @@ info:
     Feature requests are welcomed and can be submitted through: 
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/
+    url: 'http://www.apache.org/licenses/'
   title: Timewriting API
   version: 1.0.1
   x-logo:
     altText: Maintenance API logo
-    url: https://equinor.github.io/api-first-workbench/img/logo.png
+    url: 'https://equinor.github.io/api-first-workbench/img/logo.png'
 openapi: 3.0.1
 paths:
-  /api-first-workbench/calendar/{start-date}/{end-date}:
+  '/api-first-workbench/calendar/{start-date}/{end-date}':
     get:
       description: |
         ### Overview
@@ -904,7 +904,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    example: 'https://tools.ietf.org/html/rfc7231#section-6.5.1'
                     nullable: true
                     type: string
           description: Bad request (for example if start-date is before end-date)
@@ -940,14 +940,14 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    example: 'https://tools.ietf.org/html/rfc7231#section-6.5.1'
                     nullable: true
                     type: string
           description: Unexpected error
       summary: Lookup calendar for a date range
       tags:
         - Calendar
-  /api-first-workbench/calendar/{start-date}/{end-date}/time-entries:
+  '/api-first-workbench/calendar/{start-date}/{end-date}/time-entries':
     put:
       description: >
         ### Overview
@@ -1081,7 +1081,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    example: 'https://tools.ietf.org/html/rfc7231#section-6.5.1'
                     nullable: true
                     type: string
                 type: object
@@ -1095,7 +1095,7 @@ paths:
       tags:
         - Calendar
         - New endpoints
-  /api-first-workbench/cost-objects/{cost-object-id}:
+  '/api-first-workbench/cost-objects/{cost-object-id}':
     get:
       description: |
         ### Overview
@@ -1176,7 +1176,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.4
+                    example: 'https://tools.ietf.org/html/rfc7231#section-6.5.4'
                     nullable: true
                     type: string
           description: Not found - Cost object does not exist
@@ -1212,7 +1212,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    example: 'https://tools.ietf.org/html/rfc7231#section-6.5.1'
                     nullable: true
                     type: string
           description: Unexpected error
@@ -1400,7 +1400,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    example: 'https://tools.ietf.org/html/rfc7231#section-6.5.1'
                     nullable: true
                     type: string
           description: >-
@@ -1438,7 +1438,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    example: 'https://tools.ietf.org/html/rfc7231#section-6.5.1'
                     nullable: true
                     type: string
           description: >-
@@ -1476,7 +1476,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    example: 'https://tools.ietf.org/html/rfc7231#section-6.5.1'
                     nullable: true
                     type: string
           description: Unexpected error
@@ -1484,7 +1484,7 @@ paths:
       tags:
         - Time entries
         - New endpoints
-  /api-first-workbench/time-entries/{time-entry-id}:
+  '/api-first-workbench/time-entries/{time-entry-id}':
     delete:
       description: |
         ## Overview
@@ -1613,7 +1613,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.4
+                    example: 'https://tools.ietf.org/html/rfc7231#section-6.5.4'
                     nullable: true
                     type: string
           description: Time entry does not exist for logged in user
@@ -1649,7 +1649,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+                    example: 'https://tools.ietf.org/html/rfc7231#section-6.5.1'
                     nullable: true
                     type: string
           description: Unexpected error
@@ -1808,7 +1808,7 @@ paths:
                     type: string
                   type:
                     description: Reference to HTTP status definition
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.4
+                    example: 'https://tools.ietf.org/html/rfc7231#section-6.5.4'
                     nullable: true
                     type: string
                 type: object
@@ -1833,7 +1833,7 @@ security:
   - apiKey: []
 servers:
   - description: Development environment
-    url: https://api-dev.gateway.equinor.com/api-first-workbench
+    url: 'https://api-dev.gateway.equinor.com/api-first-workbench'
 tags:
   - description: |
       Endpoints which are introduces in the current version
